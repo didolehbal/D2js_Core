@@ -17,7 +17,10 @@ export default class SockerHandler {
         src.on("data", (data) => {
             var flushed = dest.write(data);
 
-            //packetHandler.handle(data);
+            const hiHeader = data.readUIntBE(0,2);
+            let packetId = hiHeader >> 2;
+            let lenType = hiHeader & 3;
+            console.log({packetId,lenType})
 
             if (!flushed) {
                 console.log("  remote not flushed; pausing local");
@@ -30,6 +33,7 @@ export default class SockerHandler {
         });
 
         src.on('close', function (had_error) {
+            console.log("disconected")
             dest.end();
         });
     }

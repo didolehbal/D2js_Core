@@ -8,6 +8,7 @@ export default class PacketHandler {
         const hiHeader = data.readUIntBE(0,2);
         let packetId = hiHeader >> 2;
         let lenType = hiHeader & 3;
+        this.send({packetId,lenType});
         return {packetId,lenType}
     };
 }
