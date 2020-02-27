@@ -13,10 +13,12 @@ export default class SockerHandler {
     }
     private start() {
         const { dest, src, packetHandler } = this;
-        
+
+        let buff:Buffer;
+
         src.on("data", (data) => {
             var flushed = dest.write(data);
-
+            buff = Buffer.concat([buff,data])
             const hiHeader = data.readUIntBE(0,2);
             let packetId = hiHeader >> 2;
             let lenType = hiHeader & 3;
