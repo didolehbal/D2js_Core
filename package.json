@@ -5,7 +5,9 @@
   "license": "MIT",
   "scripts": {
     "start": "tsc && nodemon ./build/index.js",
-    "test": "jest"
+    "test": "jest",
+    "mock:server":"node ./src/mock/server.js",
+    "mock:client":"node ./src/mock/client.js"
   },
   "devDependencies": {
     "@types/node": "^13.7.4",

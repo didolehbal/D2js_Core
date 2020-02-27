@@ -17,7 +17,7 @@ export default class SockerHandler {
         src.on("data", (data) => {
             var flushed = dest.write(data);
 
-            packetHandler.handle(data);
+            //packetHandler.handle(data);
 
             if (!flushed) {
                 console.log("  remote not flushed; pausing local");
