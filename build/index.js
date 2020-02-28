@@ -12,9 +12,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var net_1 = __importStar(require("net"));
 var config_json_1 = __importDefault(require("./config.json"));
-var SocketHandler_1 = __importDefault(require("./network/SocketHandler"));
-var PacketHandler_js_1 = __importDefault(require("./network/PacketHandler.js"));
 var axios_1 = __importDefault(require("axios"));
+var SocketHandler_1 = __importDefault(require("./network/SocketHandler"));
 axios_1.default.put("http://127.0.0.1:80/api/createandinject?exePath=" + config_json_1.default.DOFUS_PATH, {
     RedirectionPort: config_json_1.default.port,
     RedirectedIps: config_json_1.default.authServerIps
@@ -36,8 +35,8 @@ function handleConnection(dofusClient) {
         console.trace(ex);
         process.exit(-1);
     }
-    var clientHandler = new SocketHandler_1.default(dofusClient, dofusServer, new PacketHandler_js_1.default(function () { }));
-    var serverHandler = new SocketHandler_1.default(dofusServer, dofusClient, new PacketHandler_js_1.default(function (info) { console.log(info); }));
+    var clientHandler = new SocketHandler_1.default(dofusClient, dofusServer, "CLIENT");
+    var serverHandler = new SocketHandler_1.default(dofusServer, dofusClient, "SERVER");
 }
 proxy.on("connection", handleConnection);
 proxy.on("error", function (err) {
