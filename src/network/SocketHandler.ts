@@ -13,8 +13,19 @@ export default class SockerHandler {
     }
     private handlePacket(data: Buffer | null){
         if(data){
+            let offset = 0;
             let serversLength = data.readUIntBE(0,2)
-            
+            offset+=2
+
+         let _box0:number = data.readUIntBE(offset,1);
+
+         let isMonoAccount = BooleanByteWrapper.getFlag(_box0,0);
+
+         this.isSelectable = BooleanByteWrapper.getFlag(_box0,1);
+
+      
+
+
         }
     }
     private start() {
