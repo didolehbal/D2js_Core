@@ -85,6 +85,7 @@ export default class SockerHandler {
                 dest.pause();
             }
             if (name == "CLIENT") return;
+            
             let buffIndex = 0;
             let buffLength = data.length
             while (buffIndex < buffLength - 1) {
