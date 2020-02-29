@@ -1,8 +1,8 @@
 import Net, { Socket } from "net"
 import Config from "./config.json"
-import SocketHandler from "./network/SocketHandler"
-import PacketHandler from "./network/PacketHandler.js"
 import axios from "axios"
+import DofusSocket from "./network/DofusSocket"
+import SocketHandler from "./network/SocketHandler"
 
 axios.put(`http://127.0.0.1:80/api/createandinject?exePath=${Config.DOFUS_PATH}`,{
     RedirectionPort:Config.port,
@@ -31,9 +31,9 @@ function handleConnection(dofusClient: Socket) {
         process.exit(-1)
     }
 
-    const clientHandler = new SocketHandler(dofusClient,dofusServer, new PacketHandler(()=>{}));
+    const clientHandler = new SocketHandler(dofusClient,dofusServer,"CLIENT");
 
-    const serverHandler = new SocketHandler(dofusServer,dofusClient, new PacketHandler((info:any)=>{console.log(info)}));
+    const serverHandler = new SocketHandler(dofusServer,dofusClient,"SERVER");
 
     
 }
