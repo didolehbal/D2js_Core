@@ -186,7 +186,9 @@ export class CustomDataWrapper {
 
 
    public writeInt(value: number): void {
-
+      let buff = Buffer.alloc(4)
+      buff.writeInt32BE(value, 0)
+      this._data = Buffer.concat([this._data, buff])
    }
    public writeBoolean(value: boolean): void {
       let buff = Buffer.alloc(1)

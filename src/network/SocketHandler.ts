@@ -1,16 +1,18 @@
 import { Socket } from "net";
 import PacketHandler from "./PacketHandler"
 import SelectedServerDataMessage from "../ankama/SelectedServerDataMessage"
+import Message from "../ankama/Message";
 
 export default class SocketHandler {
     private client: Socket;
     private server: Socket;
-
-    constructor(client: Socket, server: Socket) {
+    private _MessagesToHandle: Message[]
+    constructor(client: Socket, server: Socket, messagesToHandle: Message[]) {
         this.client = client;
         this.server = server;
+        this._MessagesToHandle = messagesToHandle
     }
-  
+
     public start = () => {
         const { server, client } = this;
 
@@ -26,10 +28,9 @@ export default class SocketHandler {
 
         server.on("data", (data) => {
 
-            let selectedservData = new SelectedServerDataMessage()
 
-            
-            let packetHandler = new PacketHandler("Server",[selectedservData]);
+
+            let packetHandler = new PacketHandler("Server", this._MessagesToHandle);
             let processedData = packetHandler.processChunk(data)
 
             var flushed = client.write(processedData);

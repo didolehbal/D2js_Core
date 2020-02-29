@@ -21,11 +21,11 @@ export default class SelectedServerDataMessage extends Message {
         let dataWrapper = new CustomDataWrapper(Buffer.alloc(0))
 
         dataWrapper.writeVarShort(this.serverId)
-        dataWrapper.writeUTF(this.address) // CHANGE TO LOCALHOST
-        dataWrapper.writeShort(this.ports.length)
-        for(let i =0; i<this.ports.length; i++){
-            dataWrapper.writeInt(this.ports[i])
-        }
+        dataWrapper.writeUTF("localhost")//(this.address) // CHANGE TO LOCALHOST
+        dataWrapper.writeShort(1)
+        //for(let i =0; i<this.ports.length; i++)
+            dataWrapper.writeInt(7778)
+        
         dataWrapper.writeBoolean(this.canCreateNewCharacter)
         dataWrapper.writeVarInt(this.tickets.length)
         for(let i =0; i<this.tickets.length; i++){

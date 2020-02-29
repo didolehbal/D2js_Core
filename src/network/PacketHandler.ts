@@ -2,51 +2,93 @@ import Message from "../ankama/Message";
 
 export default class PacketHandler {
 
-    private _name:string;
-    private _messagesToHandle :Message[];
-    constructor(name : string,messagesToHandle :Message[]) {
-        this._name=name;
-        this._messagesToHandle=messagesToHandle
+    private _name: string;
+    private _messagesToHandle: Message[];
+    constructor(name: string, messagesToHandle: Message[]) {
+        this._name = name;
+        this._messagesToHandle = messagesToHandle
     }
-    private extractHeader = (data:Buffer, offset:number) =>{
+    public unpackHeader = (data: Buffer, offset: number) => {
         const header = data.readIntBE(offset, 2);
         let packetId = header >> 2;
         let lenType = header & 3;
-        
+
         let length = 0
         if (lenType > 0) {
             length = data.readIntBE(offset + 2, lenType)
         }
-        return {header:{packetId, lenType, length},offset: offset + 2 + lenType}
+        return { header: { packetId, lenType, length }, offset: offset + 2 + lenType }
 
     }
-    private extractPacket = (data:Buffer, offset:number) => {
+    public packHeader = (packetId: number,length:number) : Buffer => {
+        let rawHeader = Buffer.alloc(0)
+        let headBff = Buffer.alloc(2)
 
-        let {header, offset: newOffset} = this.extractHeader(data, offset);
-        //get body of message  
+        let lenType = 0
+        for(let b=length ; b != 0 ; b = b >>> 8)
+            lenType++;
+
+        if(lenType >3)
+            throw Error("lentype Exceeded 3")
+
+        headBff.writeUInt16BE( (packetId << 2) + lenType ,0)
+        rawHeader = Buffer.concat([rawHeader,headBff])
+
+        if(lenType > 0){
+            let lengthBff = Buffer.alloc(lenType)
+            lengthBff.writeIntBE(length,0,lenType)
+            rawHeader = Buffer.concat([rawHeader, lengthBff])
+        }
+        return rawHeader;
+    }
+
+    private extractPacket = (data: Buffer, offset: number) :ExtractPacket => {
+
+        let { header, offset: newOffset } = this.unpackHeader(data, offset);
+
+        let rawPacket:Buffer = data.slice(offset);
+
         this._messagesToHandle.map(msg => {
-            if(msg.protocolId == header.packetId){
-                msg.unpack(data, newOffset)
+            if (msg.protocolId == header.packetId) {
+                msg.unpack(data, newOffset) // we unpack the packet and put its state into msg
+
                 console.log(this._name, msg.toString())
+
+                let bodybuff = msg.pack(); // here we change packet content and convert it to raw
+                let rawHead = this.packHeader(header.packetId,bodybuff.length) // here we change body length in header
+
+                rawPacket = Buffer.concat([rawHead,bodybuff])
             }
-            else{
+            else {
+                rawPacket = data
                 console.log(this._name, header)
             }
         })
-        return {header,offset: newOffset+ header.length }
+        const packet = {header}
+        return { packet, offset: newOffset + header.length, rawPacket }
     }
-     public processChunk = (data:Buffer) : Buffer =>{
-            let offset = 0;
-            let buffLength = data.length
-            try{
-                while (offset < buffLength - 1) {
-                    let {offset: newOffset} = this.extractPacket(data,offset)
-                    offset = newOffset
-                  }
-            }catch(ex){
-                console.log(ex)
+
+
+    public processChunk = (data: Buffer): Buffer => {
+        let offset = 0;
+        let buffLength = data.length
+        let procssedData = Buffer.alloc(0)
+        try {
+            while (offset < buffLength - 1) {
+                let { offset: newOffset,packet,rawPacket } = this.extractPacket(data, offset)
+                offset = newOffset
+                procssedData = Buffer.concat([procssedData, rawPacket])
             }
-           
-            return data
+        } catch (ex) {
+            console.log(ex)
+        }
+
+        return data
     }
+}
+
+interface ExtractPacket{
+    rawPacket :Buffer,
+    packet:Object,
+    offset:number
 }

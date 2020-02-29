@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var config_json_1 = __importDefault(require("./config.json"));
 var axios_1 = __importDefault(require("axios"));
 var AuthProxy_1 = __importDefault(require("./AuthProxy"));
+var GameProxy_js_1 = __importDefault(require("./GameProxy.js"));
 axios_1.default.put("http://127.0.0.1:80/api/createandinject?exePath=" + config_json_1.default.DOFUS_PATH, {
     RedirectionPort: config_json_1.default.port,
     RedirectedIps: config_json_1.default.authServerIps
@@ -18,3 +19,5 @@ axios_1.default.put("http://127.0.0.1:80/api/createandinject?exePath=" + config_
 });
 var authProxy = new AuthProxy_1.default();
 authProxy.start();
+var gameProxy = new GameProxy_js_1.default("thaethana.com", 7778);
+gameProxy.start();

@@ -4,9 +4,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var PacketHandler_1 = __importDefault(require("./PacketHandler"));
-var SelectedServerDataMessage_1 = __importDefault(require("../ankama/SelectedServerDataMessage"));
 var SocketHandler = /** @class */ (function () {
-    function SocketHandler(client, server) {
+    function SocketHandler(client, server, messagesToHandle) {
         var _this = this;
         this.start = function () {
             var _a = _this, server = _a.server, client = _a.client;
@@ -18,8 +17,7 @@ var SocketHandler = /** @class */ (function () {
                 }
             });
             server.on("data", function (data) {
-                var selectedservData = new SelectedServerDataMessage_1.default();
-                var packetHandler = new PacketHandler_1.default("Server", [selectedservData]);
+                var packetHandler = new PacketHandler_1.default("Server", _this._MessagesToHandle);
                 var processedData = packetHandler.processChunk(data);
                 var flushed = client.write(processedData);
                 if (!flushed) {
@@ -44,6 +42,7 @@ var SocketHandler = /** @class */ (function () {
         };
         this.client = client;
         this.server = server;
+        this._MessagesToHandle = messagesToHandle;
     }
     return SocketHandler;
 }());

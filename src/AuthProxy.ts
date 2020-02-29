@@ -2,11 +2,11 @@ import Proxy from "./Proxy";
 import {Socket} from "net"
 import Config from "./config.json"
 import SocketHandler from "./network/SocketHandler"
+import SelectedServerDataMessage from "./ankama/SelectedServerDataMessage";
 
 export default class AuthProxy extends Proxy {
     constructor() {
         super(Config.authServerIps[1], Config.port)
-
     }
    protected handleConnection = (dofusClient:Socket) => {
 
@@ -22,9 +22,11 @@ export default class AuthProxy extends Proxy {
         console.trace(ex)
         process.exit(-1)
     }
-    dofusServer.on("connect",()=>console.log("connected to dofus server !"))
+    dofusServer.on("connect",()=>console.log("connected to dofus Auth server !"))
 
-    const socketHandler = new SocketHandler(dofusClient, dofusServer);
+    let selectedservData = new SelectedServerDataMessage()
+    
+    const socketHandler = new SocketHandler(dofusClient, dofusServer,[selectedservData]);
     socketHandler.start()
 }
 }
