@@ -28,7 +28,9 @@ export class CustomDataWrapper {
       this.position = position;
    }
 
-
+   public getBuffer= ():Buffer => {
+      return this._data
+   }
 
    public readVarInt(): number {
       var b: number = 0;
@@ -105,11 +107,10 @@ export class CustomDataWrapper {
       for(let i =0;i<length;i++)
          buff[i] = this.readByte()
       let res = decoder.write(buff)
-      this.position+=length
       return res;
    }
    public readUnsignedShort(): number {
-      let b = this._data.readUIntBE(this.position, 2);
+      let b = this._data.readUInt16BE(this.position);
       this.position += 2
       return b;
    }
@@ -117,6 +118,76 @@ export class CustomDataWrapper {
       let b = this._data.readIntBE(this.position,4);
       this.position += 4
       return b;
+   }
+   public readBoolean() : boolean
+   {
+      return this.readByte() != 0;
+   }
+
+
+   public writeByte(value:number) : void
+   {
+      let buff = Buffer.alloc(1)
+      buff.writeIntBE(value & 127,0,1)
+      this._data = Buffer.concat([this._data, buff])
+   }
+   public writeBytes(value:Buffer):void{
+     this._data = Buffer.concat([this._data,value])
+      
+   }
+   public writeVarInt(value:number) : void
+
+      {
+         if(value >= 0 && value <= CustomDataWrapper.MASK_01111111)
+         {
+            this.writeByte(value);
+            return;
+         }
+         var b:any = 0;
+         var c:number = value;
+         var buffer:Buffer = Buffer.alloc(0)
+         for(; c != 0; )
+         {
+            let newb = Buffer.alloc(1)
+            newb.writeIntBE(c & CustomDataWrapper.MASK_01111111, 0, 1)
+            buffer = Buffer.concat([buffer, newb])
+            b = buffer.readIntBE( buffer.length-1 ,1)
+            c = c >>> CustomDataWrapper.CHUNCK_BIT_SIZE;
+            if(c > 0)
+            {
+
+               b = b | CustomDataWrapper.MASK_10000000;
+
+            }
+
+            this.writeByte(b);
+
+         }
+
+      }
+   public writeVarShort(value : number):void{
+    
+   }
+
+   public writeShort(value : number):void{
+         let buff =  Buffer.alloc(2)
+         buff.writeInt16BE(value,0)
+         this._data = Buffer.concat([this._data, buff])
+   }
+   public writeUTF(value : string):void{
+         this.writeShort(value.length);
+         let buff = new Buffer(value)
+         this._data = Buffer.concat([this._data,buff])
+   }
+
+ 
+   public writeInt(value : number):void{
+
+   }
+   public writeBoolean(value : boolean):void{
+      let buff = Buffer.alloc(1)
+      buff.writeIntBE(value ? 1 : 0, 0, 1)
+      this._data = Buffer.concat([this._data,buff])
    }
    /* 
    
@@ -134,10 +205,7 @@ export class CustomDataWrapper {
       this._data.readBytes(bytes,offset,length);
    }
    
-   public readBoolean() : boolean
-   {
-      return this._data.readBoolean();
-   }
+ 
    
    
    

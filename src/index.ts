@@ -1,7 +1,6 @@
-import Net, { Socket } from "net"
 import Config from "./config.json"
 import axios from "axios"
-import Proxy from "./Proxy"
+import AuthProxy from "./AuthProxy"
 
 axios.put(`http://127.0.0.1:80/api/createandinject?exePath=${Config.DOFUS_PATH}`, {
     RedirectionPort: Config.port,
@@ -14,8 +13,6 @@ axios.put(`http://127.0.0.1:80/api/createandinject?exePath=${Config.DOFUS_PATH}`
         console.error("Injection failed", err.response)
     })
 
-const authProxy = new Proxy(Config.authServerIps[0], Config.port)
+const authProxy = new AuthProxy()
 authProxy.start()
 
-const gameProxy = new Proxy("thanatena.ankama-games.com",7777)
-gameProxy.start()
