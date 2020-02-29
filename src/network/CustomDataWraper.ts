@@ -28,7 +28,7 @@ export class CustomDataWrapper {
       this.position = position;
    }
 
-   public getBuffer= ():Buffer => {
+   public getBuffer = (): Buffer => {
       return this._data
    }
 
@@ -93,101 +93,105 @@ export class CustomDataWrapper {
    }
    public readDouble(): number {
       let b = this._data.readDoubleBE(this.position);
-      this.position+=8;
+      this.position += 8;
       return b
    }
 
    public readUTF(): string {
       const { StringDecoder } = require('string_decoder');
       const decoder = new StringDecoder('utf8');
-
       let length = this._data.readIntBE(this.position, 2)
       this.position += 2
       let buff = Buffer.alloc(length)
-      for(let i =0;i<length;i++)
+      for (let i = 0; i < length; i++)
          buff[i] = this.readByte()
       let res = decoder.write(buff)
       return res;
    }
+
    public readUnsignedShort(): number {
       let b = this._data.readUInt16BE(this.position);
       this.position += 2
       return b;
    }
+
    public readInt(): number {
-      let b = this._data.readIntBE(this.position,4);
+      let b = this._data.readIntBE(this.position, 4);
       this.position += 4
       return b;
    }
-   public readBoolean() : boolean
-   {
+   public readBoolean(): boolean {
       return this.readByte() != 0;
    }
 
 
-   public writeByte(value:number) : void
-   {
+   public writeByte(value: number): void {
       let buff = Buffer.alloc(1)
-      buff.writeIntBE(value & 127,0,1)
+      buff.writeUIntBE(value & 255, 0, 1)
       this._data = Buffer.concat([this._data, buff])
    }
-   public writeBytes(value:Buffer):void{
-     this._data = Buffer.concat([this._data,value])
-      
+   public writeBytes(value: Buffer): void {
+      this._data = Buffer.concat([this._data, value])
+
    }
-   public writeVarInt(value:number) : void
-
-      {
-         if(value >= 0 && value <= CustomDataWrapper.MASK_01111111)
-         {
-            this.writeByte(value);
-            return;
-         }
-         var b:any = 0;
-         var c:number = value;
-         var buffer:Buffer = Buffer.alloc(0)
-         for(; c != 0; )
-         {
-            let newb = Buffer.alloc(1)
-            newb.writeIntBE(c & CustomDataWrapper.MASK_01111111, 0, 1)
-            buffer = Buffer.concat([buffer, newb])
-            b = buffer.readIntBE( buffer.length-1 ,1)
-            c = c >>> CustomDataWrapper.CHUNCK_BIT_SIZE;
-            if(c > 0)
-            {
-
-               b = b | CustomDataWrapper.MASK_10000000;
-
-            }
-
-            this.writeByte(b);
-
-         }
-
+  
+   public writeVarInt(value: number): void {
+      if (value >= 0 && value <= CustomDataWrapper.MASK_01111111) {
+         this.writeByte(value);
+         return;
       }
-   public writeVarShort(value : number):void{
-    
+      var b: number = 0;
+      var c: number = value;
+      for (; c != 0;) {
+         b = c & CustomDataWrapper.MASK_01111111
+         c = c >>> CustomDataWrapper.CHUNCK_BIT_SIZE;
+         if (c > 0) {
+            b = b | CustomDataWrapper.MASK_10000000;
+         }
+         this.writeByte(b)
+      }
+   }
+   public writeVarShort(value: number): void {
+      if(value > CustomDataWrapper.SHORT_MAX_VALUE || value < CustomDataWrapper.SHORT_MIN_VALUE)
+         {
+            throw new Error("Forbidden value");
+         }
+         
+      if (value >= 0 && value <= CustomDataWrapper.MASK_01111111) {
+         this.writeByte(value);
+         return;
+      }
+      var b: number = 0;
+      var c: number = value;
+      for (; c != 0;) {
+         b = c & CustomDataWrapper.MASK_01111111
+         c = c >>> CustomDataWrapper.CHUNCK_BIT_SIZE;
+         if (c > 0) {
+            b = b | CustomDataWrapper.MASK_10000000;
+         }
+         this.writeByte(b)
+      }
    }
 
-   public writeShort(value : number):void{
-         let buff =  Buffer.alloc(2)
-         buff.writeInt16BE(value,0)
-         this._data = Buffer.concat([this._data, buff])
+   public writeShort(value: number): void {
+      let buff = Buffer.alloc(2)
+      buff.writeInt16BE(value, 0)
+      this._data = Buffer.concat([this._data, buff])
    }
-   public writeUTF(value : string):void{
-         this.writeShort(value.length);
-         let buff = new Buffer(value)
-         this._data = Buffer.concat([this._data,buff])
+   public writeUTF(value: string): void {
+      this.writeShort(value.length);
+      let buff = new Buffer(value)
+      this._data = Buffer.concat([this._data, buff])
    }
 
- 
-   public writeInt(value : number):void{
+
+   public writeInt(value: number): void {
 
    }
-   public writeBoolean(value : boolean):void{
+   public writeBoolean(value: boolean): void {
       let buff = Buffer.alloc(1)
       buff.writeIntBE(value ? 1 : 0, 0, 1)
-      this._data = Buffer.concat([this._data,buff])
+      this._data = Buffer.concat([this._data, buff])
    }
    /* 
    
