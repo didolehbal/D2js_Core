@@ -34,10 +34,12 @@ var PacketHandler = /** @class */ (function () {
             var _a = _this.unpackHeader(data, offset), header = _a.header, newOffset = _a.offset;
             var rawPacket = data.slice(offset);
             _this._messagesToHandle.map(function (msg) {
-                if (msg.protocolId == header.packetId) {
+                if (header.packetId == 6469 || msg.protocolId == header.packetId) {
                     msg.unpack(data, newOffset); // we unpack the packet and put its state into msg
                     console.log(_this._name, msg.toString());
-                    var bodybuff = msg.pack(); // here we change packet content and convert it to raw
+                    msg.alterMsg();
+                    console.log("after alter", _this._name, msg.toString());
+                    var bodybuff = msg.pack(); // here we convert it to raw
                     var rawHead = _this.packHeader(header.packetId, bodybuff.length); // here we change body length in header
                     rawPacket = Buffer.concat([rawHead, bodybuff]);
                 }
@@ -63,7 +65,7 @@ var PacketHandler = /** @class */ (function () {
             catch (ex) {
                 console.log(ex);
             }
-            return data;
+            return procssedData;
         };
         this._name = name;
         this._messagesToHandle = messagesToHandle;

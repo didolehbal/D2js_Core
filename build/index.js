@@ -19,5 +19,5 @@ axios_1.default.put("http://127.0.0.1:80/api/createandinject?exePath=" + config_
 });
 var authProxy = new AuthProxy_1.default();
 authProxy.start();
-var gameProxy = new GameProxy_js_1.default("thaethana.com", 7778);
+var gameProxy = new GameProxy_js_1.default("thanatena.ankama-games.com", 7778);
 gameProxy.start();

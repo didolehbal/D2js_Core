@@ -3,7 +3,7 @@ import { BooleanByteWrapper } from "../network/BooleanByteWrapper"
 import { CustomDataWrapper } from "../network/CustomDataWraper";
 
 export default class SelectedServerDataMessage extends Message {
-      public static protocolId:number = 6469;
+      public static protocolId:number = 42;
       private _isInitialized:boolean = false;
       public serverId:number = 0;
       public address:string = "";
@@ -11,8 +11,8 @@ export default class SelectedServerDataMessage extends Message {
       public canCreateNewCharacter:boolean = false;
       public tickets:number[];
 
-      constructor(){
-        super(SelectedServerDataMessage.protocolId);
+      constructor(protocolId : number = 42 ){
+        super(protocolId);
          this.ports = new Array<number>();
          this.tickets = new Array<number>();
       }
@@ -21,10 +21,10 @@ export default class SelectedServerDataMessage extends Message {
         let dataWrapper = new CustomDataWrapper(Buffer.alloc(0))
 
         dataWrapper.writeVarShort(this.serverId)
-        dataWrapper.writeUTF("localhost")//(this.address) // CHANGE TO LOCALHOST
-        dataWrapper.writeShort(1)
-        //for(let i =0; i<this.ports.length; i++)
-            dataWrapper.writeInt(7778)
+        dataWrapper.writeUTF(this.address) // CHANGE TO LOCALHOST
+        dataWrapper.writeShort(this.ports.length)
+        for(let i =0; i<this.ports.length; i++)
+            dataWrapper.writeInt(this.ports[i])
         
         dataWrapper.writeBoolean(this.canCreateNewCharacter)
         dataWrapper.writeVarInt(this.tickets.length)
@@ -34,7 +34,13 @@ export default class SelectedServerDataMessage extends Message {
         return dataWrapper.getBuffer()
       }
 
-      public unpack= (data:Buffer, offset:number) : void =>{
+      public alterMsg =()=>{
+        this.ports = [7778]
+        this.address ="localhost"
+      }
+
+      public unpack (data:Buffer, offset:number) : CustomDataWrapper | null{
+        let dataWrapper = null;
         if (data) {
             let dataWrapper = new CustomDataWrapper(data.slice(offset))
             this.serverId = dataWrapper.readVarUhShort();
@@ -52,6 +58,7 @@ export default class SelectedServerDataMessage extends Message {
                 this.tickets.push(dataWrapper.readByte())
             }
         }
+        return dataWrapper
       }
 
       public toString = ():string => {

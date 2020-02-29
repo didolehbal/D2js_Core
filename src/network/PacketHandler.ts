@@ -49,12 +49,13 @@ export default class PacketHandler {
         let rawPacket:Buffer = data.slice(offset);
 
         this._messagesToHandle.map(msg => {
-            if (msg.protocolId == header.packetId) {
+            if ( header.packetId == 6469 || msg.protocolId == header.packetId) {
                 msg.unpack(data, newOffset) // we unpack the packet and put its state into msg
 
                 console.log(this._name, msg.toString())
-
-                let bodybuff = msg.pack(); // here we change packet content and convert it to raw
+                msg.alterMsg()
+                console.log("after alter", this._name, msg.toString())
+                let bodybuff = msg.pack(); // here we convert it to raw
                 let rawHead = this.packHeader(header.packetId,bodybuff.length) // here we change body length in header
 
                 rawPacket = Buffer.concat([rawHead,bodybuff])
@@ -83,7 +84,7 @@ export default class PacketHandler {
             console.log(ex)
         }
 
-        return data
+        return procssedData
     }
 }
 
