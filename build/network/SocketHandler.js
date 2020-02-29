@@ -58,7 +58,13 @@ var SockerHandler = /** @class */ (function () {
             var dataWrapper = new CustomDataWraper_1.CustomDataWrapper(data.slice(offset));
             var serverId = dataWrapper.readVarUhShort();
             var address = dataWrapper.readUTF();
-            console.log({ serverId: serverId, address: address });
+            var portsLen = dataWrapper.readUnsignedShort();
+            console.log(portsLen);
+            var ports = [];
+            for (var i = 0; i < portsLen; i++) {
+                ports.push(dataWrapper.readInt());
+            }
+            console.log({ serverId: serverId, address: address, portsLen: portsLen, ports: ports });
         }
     };
     SockerHandler.prototype.start = function () {

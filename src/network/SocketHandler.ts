@@ -63,7 +63,14 @@ export default class SockerHandler {
             let dataWrapper = new CustomDataWrapper(data.slice(offset))
             let serverId = dataWrapper.readVarUhShort();
             let address = dataWrapper.readUTF();
-            console.log({serverId,address})
+            let portsLen = dataWrapper.readUnsignedShort();
+            console.log(portsLen)
+            let ports =[]
+            for(let i =0; i<portsLen; i++){
+                ports.push(dataWrapper.readInt())
+            }
+            console.log({serverId,address,portsLen,ports})
+
         }
     }
     private start() {

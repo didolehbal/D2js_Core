@@ -114,8 +114,7 @@ export class CustomDataWrapper {
       return b;
    }
    public readInt(): number {
-
-      let b = this._data.readInt32BE(this.position);
+      let b = this._data.readIntBE(this.position,4);
       this.position += 4
       return b;
    }
