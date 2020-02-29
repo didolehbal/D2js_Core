@@ -91,20 +91,35 @@ export class CustomDataWrapper {
    }
    public readDouble(): number {
       let b = this._data.readDoubleBE(this.position);
-      this.position++;
+      this.position+=8;
       return b
    }
 
    public readUTF(): string {
-      let res = ""
-      for (let i = 0; i < 4; i++) {
-         let b = this._data.readIntBE(this.position, 1);
-         this.position++;
-         res += b.toString()
-      }
-      return res
+      const { StringDecoder } = require('string_decoder');
+      const decoder = new StringDecoder('utf8');
+
+      let length = this._data.readIntBE(this.position, 2)
+      this.position += 2
+      let buff = Buffer.alloc(length)
+      for(let i =0;i<length;i++)
+         buff[i] = this.readByte()
+      let res = decoder.write(buff)
+      this.position+=length
+      return res;
    }
-   /*
+   public readUnsignedShort(): number {
+      let b = this._data.readUIntBE(this.position, 2);
+      this.position += 2
+      return b;
+   }
+   public readInt(): number {
+
+      let b = this._data.readInt32BE(this.position);
+      this.position += 4
+      return b;
+   }
+   /* 
    
    public readVarLong() : number
    {

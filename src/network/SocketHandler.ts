@@ -94,7 +94,7 @@ export default class SockerHandler {
                     body = data.slice(offset, offset + length)
                 }
                 //handle packet
-                if (packetId === 6469)
+                if (packetId === 6469 || packetId === 42)
                     this.handlePacket(body)
                 console.log({ packetId, lenType, length })
                 buffIndex = offset + length
