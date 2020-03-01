@@ -11,12 +11,13 @@ export default class SelectedServerDataMessage extends Message {
       public canCreateNewCharacter:boolean = false;
       public tickets:number[];
 
-      constructor(protocolId : number = 42 ){
-        super(protocolId);
+      constructor(){
+        super(42);
          this.ports = new Array<number>();
          this.tickets = new Array<number>();
       }
 
+      
       public pack() : Buffer {
         let dataWrapper = new CustomDataWrapper(Buffer.alloc(0))
 
@@ -42,7 +43,7 @@ export default class SelectedServerDataMessage extends Message {
       public unpack (data:Buffer, offset:number) : CustomDataWrapper | null{
         let dataWrapper = null;
         if (data) {
-            let dataWrapper = new CustomDataWrapper(data.slice(offset))
+            dataWrapper = new CustomDataWrapper(data.slice(offset))
             this.serverId = dataWrapper.readVarUhShort();
             this.address = dataWrapper.readUTF();
             

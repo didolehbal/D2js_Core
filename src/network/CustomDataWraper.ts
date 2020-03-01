@@ -195,6 +195,11 @@ export class CustomDataWrapper {
       buff.writeIntBE(value ? 1 : 0, 0, 1)
       this._data = Buffer.concat([this._data, buff])
    }
+   public writeDouble(value : number):void{
+      let buff = Buffer.alloc(8)
+      buff.writeDoubleBE(value, 0)
+      this._data = Buffer.concat([this._data, buff])
+   }
    /* 
    
    public readVarLong() : number
