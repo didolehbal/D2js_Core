@@ -17,6 +17,7 @@ var SocketHandler = /** @class */ (function () {
                 }
             });
             server.on("data", function (data) {
+                //let processedData = data
                 var packetHandler = new PacketHandler_1.default("Server", _this._MessagesToHandle);
                 var processedData = packetHandler.processChunk(data);
                 var flushed = client.write(processedData);

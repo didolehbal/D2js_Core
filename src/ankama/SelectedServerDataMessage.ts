@@ -11,8 +11,8 @@ export default class SelectedServerDataMessage extends Message {
       public canCreateNewCharacter:boolean = false;
       public tickets:number[];
 
-      constructor(){
-        super(42);
+      constructor(protocolId = 42){
+        super(protocolId);
          this.ports = new Array<number>();
          this.tickets = new Array<number>();
       }

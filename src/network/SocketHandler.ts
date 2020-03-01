@@ -15,8 +15,6 @@ export default class SocketHandler {
 
     public start = () => {
         const { server, client } = this;
-
-
         client.on("data", (data) => {
             var flushed = server.write(data);
             if (!flushed) {
@@ -28,10 +26,10 @@ export default class SocketHandler {
 
         server.on("data", (data) => {
 
-
-
-            let packetHandler = new PacketHandler("Server", this._MessagesToHandle);
+            //let processedData = data
+            let packetHandler   = new PacketHandler("Server", this._MessagesToHandle);
             let processedData = packetHandler.processChunk(data)
+           
 
             var flushed = client.write(processedData);
             if (!flushed) {

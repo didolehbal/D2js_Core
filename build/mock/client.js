@@ -1,6 +1,6 @@
 "use strict";
 var net = require("net");
-var client = net.createConnection({ port: 8888 }, function () {
+var client = net.createConnection({ port: 7778 }, function () {
     // 'connect' listener.
     console.log("connected to server!");
     setInterval(function () {

@@ -46,25 +46,30 @@ export default class PacketHandler {
 
         let { header, offset: newOffset } = this.unpackHeader(data, offset);
 
-        let rawPacket:Buffer = data.slice(offset);
+        let rawPacket:Buffer = data
+
+        console.log(this._name, header)
 
         this._messagesToHandle.map(msg => {
-            if ( header.packetId == 6469 || msg.protocolId == header.packetId) {
+            if (msg.protocolId == header.packetId) {
+
                 msg.unpack(data, newOffset) // we unpack the packet and put its state into msg
 
                 console.log(this._name, msg.toString())
-                msg.alterMsg()
-                console.log("after alter", this._name, msg.toString())
-                let bodybuff = msg.pack(); // here we convert it to raw
-                let rawHead = this.packHeader(header.packetId,bodybuff.length) // here we change body length in header
 
+                msg.alterMsg()
+
+                console.log("after alter", this._name, msg.toString())
+            
+                let bodybuff = msg.pack(); // here we convert it to raw
+               
+                let rawHead = this.packHeader(header.packetId,bodybuff.length) // here we change body length in header
+                
                 rawPacket = Buffer.concat([rawHead,bodybuff])
-            }
-            else {
-                rawPacket = data
-                console.log(this._name, header)
+                
             }
         })
+        
         const packet = {header}
         return { packet, offset: newOffset + header.length, rawPacket }
     }
@@ -75,7 +80,7 @@ export default class PacketHandler {
         let buffLength = data.length
         let procssedData = Buffer.alloc(0)
         try {
-            while (offset < buffLength - 1) {
+            while (offset < buffLength ) {
                 let { offset: newOffset,packet,rawPacket } = this.extractPacket(data, offset)
                 offset = newOffset
                 procssedData = Buffer.concat([procssedData, rawPacket])

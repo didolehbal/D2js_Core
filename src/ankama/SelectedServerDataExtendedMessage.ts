@@ -4,10 +4,12 @@ import GameServerInformations from "./GameServerInformations";
 export default class SelectedServerDataExtendedMessage extends SelectedServerDataMessage {
     public static protocolId: number = 6469;
     public _servers: GameServerInformations[]
+
     constructor() {
-        super()
+        super(6469)
         this._servers = new Array<GameServerInformations>()
     }
+
     public pack = (): Buffer => {
         let bf: Buffer = super.pack();
 
@@ -21,6 +23,7 @@ export default class SelectedServerDataExtendedMessage extends SelectedServerDat
         }
         return Buffer.concat([bf, bff])
     }
+
     public unpack = (data: Buffer, offset: number): CustomDataWrapper | null => {
         let dataWrapper = super.unpack(data, offset)
         if (dataWrapper != null) {
@@ -35,4 +38,5 @@ export default class SelectedServerDataExtendedMessage extends SelectedServerDat
         }
         return dataWrapper
     }
+    
 }
