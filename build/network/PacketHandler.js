@@ -32,8 +32,7 @@ var PacketHandler = /** @class */ (function () {
         };
         this.extractPacket = function (data, offset) {
             var _a = _this.unpackHeader(data, offset), header = _a.header, newOffset = _a.offset;
-            var rawPacket = data;
-            console.log(_this._name, header);
+            var rawPacket = data.slice(offset, offset + header.length);
             _this._messagesToHandle.map(function (msg) {
                 if (msg.protocolId == header.packetId) {
                     msg.unpack(data, newOffset); // we unpack the packet and put its state into msg
@@ -57,6 +56,7 @@ var PacketHandler = /** @class */ (function () {
                     var _a = _this.extractPacket(data, offset), newOffset = _a.offset, packet = _a.packet, rawPacket = _a.rawPacket;
                     offset = newOffset;
                     procssedData = Buffer.concat([procssedData, rawPacket]);
+                    console.log(packet);
                 }
             }
             catch (ex) {

@@ -46,9 +46,7 @@ export default class PacketHandler {
 
         let { header, offset: newOffset } = this.unpackHeader(data, offset);
 
-        let rawPacket:Buffer = data
-
-        console.log(this._name, header)
+        let rawPacket:Buffer = data.slice(offset, offset + header.length)
 
         this._messagesToHandle.map(msg => {
             if (msg.protocolId == header.packetId) {
@@ -83,7 +81,8 @@ export default class PacketHandler {
             while (offset < buffLength ) {
                 let { offset: newOffset,packet,rawPacket } = this.extractPacket(data, offset)
                 offset = newOffset
-                procssedData = Buffer.concat([procssedData, rawPacket])
+                procssedData = Buffer.concat([procssedData, rawPacket]) 
+                console.log(packet)
             }
         } catch (ex) {
             console.log(ex)

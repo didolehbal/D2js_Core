@@ -28,8 +28,10 @@ export default class SocketHandler {
 
             //let processedData = data
             let packetHandler   = new PacketHandler("Server", this._MessagesToHandle);
-            let processedData = packetHandler.processChunk(data)
-           
+            let processedData = data
+
+            if(this._MessagesToHandle.length > 0)
+                processedData = packetHandler.processChunk(data)
 
             var flushed = client.write(processedData);
             if (!flushed) {
