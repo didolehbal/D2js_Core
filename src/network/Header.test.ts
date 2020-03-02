@@ -4,9 +4,9 @@ import Header from "./Header"
 test("to/from raw",()=>{
 
     const header = new Header(1,1,8)
-    let rawHeader = header.toRaw()
-    const sameHeader = Header.fromRaw(rawHeader)
+    const header2 = new Header(1,1,8)
 
-    expect(header).toEqual(sameHeader)
-    
+    expect(header.toRaw()).toEqual(header2.toRaw())
+    expect(header2).toEqual(header)
+
 })

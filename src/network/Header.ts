@@ -17,7 +17,7 @@ export default class Header {
         return this._lenType;
     }
     get length(): number {
-        return this._lenType
+        return this._length
     }
 
     set packetID(id: number) {

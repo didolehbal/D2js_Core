@@ -17,8 +17,10 @@ export default class PacketHandler {
         const header = Header.fromRaw(data)
         const nextOffset = header.headerByteLength()
 
-        let nextPacketOffset = nextOffset + header.length
+        let nextPacketOffset = offset + nextOffset + header.length
+
         let rawPacket: Buffer = data.slice(offset, nextPacketOffset)
+        //console.log({offset, nextPacketOffset, rawLength:rawPacket.length})
 
         if (rawPacket.length < header.length) {
             console.log(`packet ${header.packetID} length mismatch :  raw ${rawPacket.length} !=  header ${header.length}`)
