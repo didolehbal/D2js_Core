@@ -2,6 +2,7 @@ import Proxy from "./Proxy";
 import {Socket} from "net"
 import Config from "./config.json"
 import SocketHandler from "./network/SocketHandler"
+import SelectedServerDataMessage from "./ankama/SelectedServerDataMessage";
 
 export default class GameProxy extends Proxy {
     constructor(remoteAdress:string,localPort:number) {
@@ -24,7 +25,8 @@ export default class GameProxy extends Proxy {
         }
         dofusServer.on("connect",()=>console.log("connected to dofus Game server !"))
     
-        const socketHandler = new SocketHandler(dofusClient, dofusServer,[]);
+        let msg = new SelectedServerDataMessage()
+        const socketHandler = new SocketHandler(dofusClient, dofusServer,[msg]);
         socketHandler.start()
     }
 }
