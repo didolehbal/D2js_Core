@@ -18,8 +18,8 @@ export default class PacketHandler {
             length = data.readIntBE(offset + 2, lenType)
         }
         return { header: { packetId, lenType, length }, offset: offset + 2 + lenType }
-
     }
+
     public packHeader = (packetId: number, length: number): Buffer => {
         let rawHeader = Buffer.alloc(0)
         let headBff = Buffer.alloc(2)
@@ -48,8 +48,9 @@ export default class PacketHandler {
         let nextPacketOffset = newOffset + header.length
         let rawPacket: Buffer = data.slice(offset, nextPacketOffset)
 
-    //        if (rawPacket.length < header.length)
- //           throw new Error("NOT ENOUGH PACKET DATA")
+        if (rawPacket.length < header.length) {
+            console.log(`packet ${header.packetId} length mismatch :  raw ${rawPacket.length} !=  header ${header.length}`)
+        }
 
         this._messagesToHandle.map(msg => {
             if (msg.protocolId == header.packetId) {
@@ -77,8 +78,6 @@ export default class PacketHandler {
 
 
     public processChunk = (data: Buffer): Buffer => {
-        if(data.length < 2)
-            return data
         let offset = 0;
         const buffLength = data.length
         let procssedData = Buffer.alloc(0)

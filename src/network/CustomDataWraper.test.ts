@@ -11,7 +11,7 @@ test('read and write short', () => {
 
 test("read and write varInt",()=> {
     const dataWrapper = new CustomDataWrapper(Buffer.alloc(0));
-    const value = -600000
+    const value = -999999
     dataWrapper.writeVarInt(value)
     const res = dataWrapper.readVarInt()
     expect(res).toEqual(value)
@@ -19,7 +19,7 @@ test("read and write varInt",()=> {
 
 test("read and write varShort",()=> {
     const dataWrapper = new CustomDataWrapper(Buffer.alloc(0));
-    const value = 5
+    const value = -500
     dataWrapper.writeVarShort(value)
     const res = dataWrapper.readVarShort()
     expect(res).toEqual(value)

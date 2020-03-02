@@ -9,6 +9,7 @@ export default class AuthProxy extends Proxy {
     constructor() {
         super(Config.authServerIps[1], Config.port)
     }
+    
    protected handleConnection = (dofusClient:Socket) => {
 
     console.log("dofus client connected")

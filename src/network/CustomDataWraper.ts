@@ -59,7 +59,11 @@ export class CustomDataWrapper {
    }
 
    public readVarShort(): number {
-      var b: number = 0;
+      let res = this.readVarInt();
+      if(res > CustomDataWrapper.SHORT_MAX_VALUE || res < CustomDataWrapper.SHORT_MIN_VALUE)
+         throw Error("short EXCEEDED")
+      return res
+     /* var b: number = 0;
       var value: number = 0;
       var offset: number = 0;
       for (var hasNext: any = false; offset < CustomDataWrapper.SHORT_SIZE;) {
@@ -81,6 +85,7 @@ export class CustomDataWrapper {
          }
       }
       throw new Error("Too much data");
+      */
    }
 
    public readVarUhShort(): number {

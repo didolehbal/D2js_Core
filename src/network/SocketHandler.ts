@@ -7,6 +7,7 @@ export default class SocketHandler {
     private client: Socket;
     private server: Socket;
     private _MessagesToHandle: Message[]
+    
     constructor(client: Socket, server: Socket, messagesToHandle: Message[]) {
         this.client = client;
         this.server = server;
