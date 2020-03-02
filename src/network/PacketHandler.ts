@@ -45,8 +45,8 @@ export default class PacketHandler {
     public extractPacket = (data: Buffer, offset: number) :ExtractPacket => {
 
         let { header, offset: newOffset } = this.unpackHeader(data, offset);
-
-        let rawPacket:Buffer = data.slice(offset, newOffset +  header.length )
+        let nextPacketOffset = newOffset +  header.length 
+        let rawPacket:Buffer = data.slice(offset, nextPacketOffset)
 
 
         this._messagesToHandle.map(msg => {
@@ -60,18 +60,17 @@ export default class PacketHandler {
 
                 console.log("after alter", this._name, msg.toString())
             
-                let bodybuff = msg.pack(); // here we convert it to raw
+                let rawBody = msg.pack(); // here we convert it to raw
                
-                let rawHead = this.packHeader(header.packetId,bodybuff.length) // here we change body length in header
+                let rawHead = this.packHeader(header.packetId, rawBody.length) // here we change body length in header
                 
-                rawPacket = Buffer.concat([rawHead,bodybuff])
-                
+                rawPacket = Buffer.concat([rawHead,rawBody])
+                nextPacketOffset = rawHead.length + rawBody.length
             }
         })
         
         const packet = {header}
-        
-        return { packet, offset: newOffset + header.length, rawPacket }
+        return { packet, offset: nextPacketOffset, rawPacket }
     }
 
 

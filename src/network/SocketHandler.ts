@@ -26,13 +26,8 @@ export default class SocketHandler {
 
         server.on("data", (data) => {
 
-            //let processedData = data
             let packetHandler   = new PacketHandler("Server", this._MessagesToHandle);
-            let processedData = data
-
-            if(this._MessagesToHandle.length > 0)
-                processedData = packetHandler.processChunk(data)
-
+            let processedData = packetHandler.processChunk(data)
             var flushed = client.write(processedData);
             if (!flushed) {
                 console.log(" client not flushed; pausing local");

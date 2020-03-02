@@ -17,11 +17,8 @@ var SocketHandler = /** @class */ (function () {
                 }
             });
             server.on("data", function (data) {
-                //let processedData = data
                 var packetHandler = new PacketHandler_1.default("Server", _this._MessagesToHandle);
-                var processedData = data;
-                if (_this._MessagesToHandle.length > 0)
-                    processedData = packetHandler.processChunk(data);
+                var processedData = packetHandler.processChunk(data);
                 var flushed = client.write(processedData);
                 if (!flushed) {
                     console.log(" client not flushed; pausing local");

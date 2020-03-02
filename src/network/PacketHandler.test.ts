@@ -1,4 +1,6 @@
 import PacketHandler from './PacketHandler'
+import SelectedServerDataMessage from '../ankama/SelectedServerDataMessage';
+import SelectedServerDataExtendedMessage from '../ankama/SelectedServerDataExtendedMessage';
 
 test('pack unpack header', () => {
     let header = {
@@ -33,3 +35,19 @@ test('extractPacket', () => {
     expect(newOffset).toEqual(rawPacket.length)
 })
 
+
+
+test("processChunk ", () =>{
+    const packetHandler = new PacketHandler("test",[]);
+    let chunk : Buffer = Buffer.alloc(0)
+    for(let i=0 ; i >5; i++){
+        const smd = new SelectedServerDataMessage()
+        const smde = new SelectedServerDataExtendedMessage()
+        chunk = Buffer.concat([chunk, smd.pack(), smde.pack()])
+    }
+
+    const processesData:Buffer = packetHandler.processChunk(chunk)
+
+    expect(chunk).toEqual(processesData)
+
+})
