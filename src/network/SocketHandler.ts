@@ -1,16 +1,16 @@
 import { Socket } from "net";
 import PacketHandler from "./PacketHandler"
-import SelectedServerDataMessage from "../ankama/SelectedServerDataMessage"
 import Message from "../ankama/Message";
+import DofusSocket from "./DofusSocket"
 
 export default class SocketHandler {
     private client: Socket;
-    private server: Socket;
+    private server: DofusSocket;
     private _MessagesToHandle: Message[]
     
     constructor(client: Socket, server: Socket, messagesToHandle: Message[]) {
         this.client = client;
-        this.server = server;
+        this.server = new DofusSocket(server);
         this._MessagesToHandle = messagesToHandle
     }
 
@@ -26,10 +26,10 @@ export default class SocketHandler {
         })
 
         server.on("data", (data) => {
-            console.log("dataLength:"+data.length)
-            let packetHandler   = new PacketHandler("Server", this._MessagesToHandle);
-            let processedData = packetHandler.processChunk(data)
-            var flushed = client.write(processedData);
+            console.log(`===== new Chunk length ${data.length} ======` )
+            //let packetHandler   = new PacketHandler("Server", this._MessagesToHandle);
+            //let processedData = packetHandler.processChunk(data)
+            var flushed = client.write(data);
             if (!flushed) {
                 console.log(" client not flushed; pausing local");
                 server.pause();
@@ -50,8 +50,8 @@ export default class SocketHandler {
             client.resume();
         });
 
-        server.on('close', function (had_error) {
-            console.log("disconected")
+        server.on('close', function (hadError:any) {
+            console.log("disconected",hadError)
             client.end();
         });
     }

@@ -67,13 +67,6 @@ class DofusSocket extends Duplex {
     this._socket.on('readable', this._onReadable.bind(this));
   }
 
-  /**
-    Performs data read events which are triggered under two conditions:
-    1. underlying `readable` events emitted when there is new data
-       available on the socket
-    2. the consumer requested additional data
-    @private
-   */
   _onReadable() {
     // Read all the data until one of two conditions is met
     // 1. there is nothing left to read on the socket
@@ -81,31 +74,8 @@ class DofusSocket extends Duplex {
     while (!this._readingPaused) {
       // First step is reading the 32-bit integer from the socket
       // and if there is not a value, we simply abort processing
+      const header = new header()
       
-      let Header = this._socket.read(2)
-
-      if (!Header) return;
-      let hiheader = Header.readUInt16BE()
-
-      let packetID = hiheader >> 2
-      let lenType = hiheader & 3
-      let length = 0
-      let lenBuff
-
-  
-      if(lenType >= 0 && lenType < 4){
-        if(lenType != 0)
-            lenBuff = this._socket.read(lenType)
-        if(!lenBuff){
-           // console.log("unshift header")
-            this._socket.unshift(Header);
-            return;
-        }
-        length = lenBuff.readIntBE(0,lenType);
-      }
-
-      
-
       // ensure that we don't exceed the max size of 256KiB
       if (length > 2 ** 18) {
         this.socket.destroy(new Error('Max length exceeded'));
