@@ -62,3 +62,11 @@ test("read and write bytes (buffer)",()=> {
     const res = dataWrapper.readInt()
     expect(res).toEqual(6667)
 })
+
+
+test("buffer ",()=>{
+    const bf = Buffer.alloc(1)
+    let d = bf.readIntBE(0,1)
+    expect(d).toBeDefined()
+
+})

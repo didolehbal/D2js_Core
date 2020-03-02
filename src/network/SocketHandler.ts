@@ -26,7 +26,7 @@ export default class SocketHandler {
         })
 
         server.on("data", (data) => {
-
+            console.log("dataLength:"+data.length)
             let packetHandler   = new PacketHandler("Server", this._MessagesToHandle);
             let processedData = packetHandler.processChunk(data)
             var flushed = client.write(processedData);
