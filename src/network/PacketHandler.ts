@@ -48,6 +48,8 @@ export default class PacketHandler {
         let nextPacketOffset = newOffset +  header.length 
         let rawPacket:Buffer = data.slice(offset, nextPacketOffset)
 
+        if(rawPacket.length < header.length)
+            throw new Error("NOT ENOUGH PACKET DATA")
 
         this._messagesToHandle.map(msg => {
             if (msg.protocolId == header.packetId) {
@@ -87,6 +89,7 @@ export default class PacketHandler {
             }
         } catch (ex) {
             console.log(ex)
+            procssedData = data
         }
 
         return procssedData
