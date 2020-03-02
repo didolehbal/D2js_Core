@@ -17,5 +17,5 @@ axios.put(`http://127.0.0.1:80/api/createandinject?exePath=${Config.DOFUS_PATH}`
 const authProxy = new AuthProxy()
 authProxy.start()
 
-const gameProxy = new GameProxy("thanatena.ankama-games.com",7778)
+const gameProxy = new GameProxy("thanatena.ankama-games.com", 7778)
 gameProxy.start()

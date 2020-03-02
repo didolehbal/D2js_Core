@@ -20,35 +20,35 @@ export default class PacketHandler {
         return { header: { packetId, lenType, length }, offset: offset + 2 + lenType }
 
     }
-    public packHeader = (packetId: number,length:number) : Buffer => {
+    public packHeader = (packetId: number, length: number): Buffer => {
         let rawHeader = Buffer.alloc(0)
         let headBff = Buffer.alloc(2)
 
         let lenType = 0
-        for(let b=length ; b != 0 ; b = b >>> 8)
+        for (let b = length; b != 0; b = b >>> 8)
             lenType++;
 
-        if(lenType >3)
+        if (lenType > 3)
             throw Error("lentype Exceeded 3")
 
-        headBff.writeUInt16BE( (packetId << 2) + lenType ,0)
-        rawHeader = Buffer.concat([rawHeader,headBff])
+        headBff.writeUInt16BE((packetId << 2) + lenType, 0)
+        rawHeader = Buffer.concat([rawHeader, headBff])
 
-        if(lenType > 0){
+        if (lenType > 0) {
             let lengthBff = Buffer.alloc(lenType)
-            lengthBff.writeIntBE(length,0,lenType)
+            lengthBff.writeIntBE(length, 0, lenType)
             rawHeader = Buffer.concat([rawHeader, lengthBff])
         }
         return rawHeader;
     }
 
-    public extractPacket = (data: Buffer, offset: number) :ExtractPacket => {
+    public extractPacket = (data: Buffer, offset: number): ExtractPacket => {
 
         let { header, offset: newOffset } = this.unpackHeader(data, offset);
-        let nextPacketOffset = newOffset +  header.length 
-        let rawPacket:Buffer = data.slice(offset, nextPacketOffset)
+        let nextPacketOffset = newOffset + header.length
+        let rawPacket: Buffer = data.slice(offset, nextPacketOffset)
 
-        if(rawPacket.length < header.length)
+        if (rawPacket.length < header.length)
             throw new Error("NOT ENOUGH PACKET DATA")
 
         this._messagesToHandle.map(msg => {
@@ -61,30 +61,31 @@ export default class PacketHandler {
                 msg.alterMsg()
 
                 console.log("after alter", this._name, msg.toString())
-            
+
                 let rawBody = msg.pack(); // here we convert it to raw
-               
+
                 let rawHead = this.packHeader(header.packetId, rawBody.length) // here we change body length in header
-                
-                rawPacket = Buffer.concat([rawHead,rawBody])
+
+                rawPacket = Buffer.concat([rawHead, rawBody])
                 nextPacketOffset = rawHead.length + rawBody.length
             }
         })
-        
-        const packet = {header}
+
+        const packet = { header }
         return { packet, offset: nextPacketOffset, rawPacket }
     }
 
 
     public processChunk = (data: Buffer): Buffer => {
         let offset = 0;
-        let buffLength = data.length
+        const buffLength = data.length
         let procssedData = Buffer.alloc(0)
+        
         try {
-            while (offset < buffLength ) {
-                let { offset: newOffset,packet,rawPacket } = this.extractPacket(data, offset)
+            while (offset < buffLength) {
+                const { offset: newOffset, packet, rawPacket } = this.extractPacket(data, offset)
                 offset = newOffset
-                procssedData = Buffer.concat([procssedData, rawPacket]) 
+                procssedData = Buffer.concat([procssedData, rawPacket])
                 console.log(packet)
             }
         } catch (ex) {
@@ -96,10 +97,10 @@ export default class PacketHandler {
     }
 }
 
-interface ExtractPacket{
-    rawPacket :Buffer,
-    packet:{
-        header:{},
+interface ExtractPacket {
+    rawPacket: Buffer,
+    packet: {
+        header: {},
     },
-    offset:number
+    offset: number
 }
