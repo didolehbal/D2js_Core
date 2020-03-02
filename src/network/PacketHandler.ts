@@ -42,11 +42,12 @@ export default class PacketHandler {
         return rawHeader;
     }
 
-    private extractPacket = (data: Buffer, offset: number) :ExtractPacket => {
+    public extractPacket = (data: Buffer, offset: number) :ExtractPacket => {
 
         let { header, offset: newOffset } = this.unpackHeader(data, offset);
 
-        let rawPacket:Buffer = data.slice(offset, offset + header.length)
+        let rawPacket:Buffer = data.slice(offset, newOffset +  header.length )
+
 
         this._messagesToHandle.map(msg => {
             if (msg.protocolId == header.packetId) {
@@ -69,6 +70,7 @@ export default class PacketHandler {
         })
         
         const packet = {header}
+        
         return { packet, offset: newOffset + header.length, rawPacket }
     }
 
@@ -94,6 +96,8 @@ export default class PacketHandler {
 
 interface ExtractPacket{
     rawPacket :Buffer,
-    packet:Object,
+    packet:{
+        header:{},
+    },
     offset:number
 }
