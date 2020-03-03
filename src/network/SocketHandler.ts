@@ -14,7 +14,6 @@ export default class SocketHandler {
         this.server = new DofusSocket(server);
         this._MessagesToHandle = messagesToHandle
     }
-
     public start = () => {
         const { server, client } = this;
         client.on("data", (data) => {
@@ -46,6 +45,9 @@ export default class SocketHandler {
                     rawMsg = msg.pack()
                     header.length = rawMsg.length
                     break;
+                case 6253:
+                    client.write(rawMsg);
+                    return;
             }
 
             const rawPacket = Buffer.concat([header.toRaw(), rawMsg])

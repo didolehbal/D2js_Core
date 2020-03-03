@@ -26,38 +26,55 @@ export default class DofusSocket extends Duplex {
     _onReadable() {
         while (!this._readingPaused) {
 
-            const rawHiHeader : Buffer = this._socket.read(2)
-            if(!rawHiHeader)
+            const rawHiHeader: Buffer = this._socket.read(2)
+            if (!rawHiHeader)
                 return;
 
             const hiHeader = rawHiHeader.readUInt16BE(0)
-            const packetID =  hiHeader >> 2
+            const packetID = hiHeader >> 2
             const lenType = hiHeader & 3
 
-            if(lenType > 3 || lenType < 0){
-                throw new Error("Invalide LenType value : " +lenType)
+            if (lenType > 3 || lenType < 0) {
+                throw new Error("Invalide LenType value : " + lenType)
             }
 
-            let rawLength:Buffer = Buffer.alloc(0)
+            let rawLength: Buffer = Buffer.alloc(0)
             let length = 0
-            if(lenType > 0){
+            if (lenType > 0) {
                 rawLength = this._socket.read(lenType)
-                if(!rawLength){
+                if (!rawLength) {
                     this._socket.unshift(rawHiHeader)
                     return
                 }
-                length = rawLength.readUIntBE(0,lenType)
+                length = rawLength.readUIntBE(0, lenType)
             }
 
             const header = new Header(packetID, lenType, length)
             console.log(header)
 
-            let rawMsg:Buffer = Buffer.alloc(0)
-            if(header.length > 0 ){
-                 rawMsg = this._socket.read(header.length)
-                if(!rawMsg){
+            if (header.packetID === 6253) { //RDM
+                let rl = 0;
+                while (rl < header.length) {
+                    let raw = this._socket.read()
+                    if (rl == 0)
+                        raw = Buffer.concat([header.toRaw(), raw])
+                    rl += raw.length
+                    // i should write directly to client
+                    this.push({
+                        header,
+                        rawMsg: raw
+                    });
+                }
+                console.log("RDM DONE")
+                return
+            }
+
+            let rawMsg: Buffer = Buffer.alloc(0)
+            if (header.length > 0) {
+                rawMsg = this._socket.read(header.length)
+                if (!rawMsg) {
                     console.log("unshift " + header.length)
-                    this._socket.unshift(Buffer.concat([rawHiHeader,rawLength]))
+                    this._socket.unshift(Buffer.concat([rawHiHeader, rawLength]))
                     return
                 }
             }
