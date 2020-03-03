@@ -50,14 +50,18 @@ export default class DofusSocket extends Duplex {
             }
 
             const header = new Header(packetID, lenType, length)
+            console.log(header)
 
-            const rawMsg = this._socket.read(header.length)
-
-            if(!rawMsg){
-                this._socket.unshift(Buffer.concat([rawHiHeader,rawLength]))
-                return
+            let rawMsg:Buffer = Buffer.alloc(0)
+            if(header.length > 0 ){
+                 rawMsg = this._socket.read(header.length)
+                if(!rawMsg){
+                    console.log("unshift " + header.length)
+                    this._socket.unshift(Buffer.concat([rawHiHeader,rawLength]))
+                    return
+                }
             }
-            
+
             const packet = {
                 header,
                 rawMsg
@@ -66,8 +70,6 @@ export default class DofusSocket extends Duplex {
 
             // pause reading if consumer is slow
             if (!pushOk) this._readingPaused = true;
-
-        
         }
     }
     _read() {

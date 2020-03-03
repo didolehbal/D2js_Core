@@ -10,3 +10,16 @@ test("to/from raw",()=>{
     expect(header2).toEqual(header)
 
 })
+
+
+test("gffhfd",()=>{
+
+ 
+    const header = new Header(101,0,0)
+    let bf = Buffer.alloc(2)
+    bf.writeInt16BE(101,0)
+
+    expect(bf.length).toEqual(Buffer.concat([bf,Buffer.alloc(0)]).length)
+    expect(header.length).toEqual(0)
+    expect(header.lenType).toEqual(0)
+})

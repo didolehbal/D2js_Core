@@ -37,12 +37,14 @@ export default class SocketHandler {
                     msg.unpack(rawMsg,0)
                     msg.alterMsg()
                     rawMsg = msg.pack()
+                    header.length = rawMsg.length
                 break;
                 case 42:
                     msg = new  SelectedServerDataMessage()
                     msg.unpack(rawMsg,0)
                     msg.alterMsg()
                     rawMsg = msg.pack()
+                    header.length = rawMsg.length
                     break;
             }
 
