@@ -25,7 +25,41 @@ export default class DofusSocket extends Duplex {
     }
     _onReadable() {
         while (!this._readingPaused) {
-            const rawHeader: Buffer = this._socket.read(5)
+
+            const rawHiHeader : Buffer = this._socket.read(2)
+            if(!rawHiHeader)
+                return;
+
+            const hiHeader = rawHiHeader.readInt16BE(0)
+            const packetID =  hiHeader >> 2
+            const lenType = hiHeader & 3
+
+            let rawLength:Buffer = Buffer.alloc(0)
+            let length = 0
+            if(lenType > 0){
+                rawLength = this._socket.read(lenType)
+                if(!rawLength){
+                    this._socket.unshift(rawHiHeader)
+                    return
+                }
+                length = rawLength.readIntBE(0,lenType)
+            }
+
+            const header = new Header(packetID, lenType, length)
+
+            const rawMsg = this._socket.read(header.length)
+
+            if(!rawMsg){
+                this._socket.unshift(Buffer.concat([rawHiHeader,rawLength]))
+                return
+            }
+            const rawPacket = Buffer.concat([header.toRaw(), rawMsg])
+            let pushOk = this.push(rawPacket);
+
+            // pause reading if consumer is slow
+            if (!pushOk) this._readingPaused = true;
+
+        /*    const rawHeader: Buffer = this._socket.read(5)
             if (!rawHeader)
                 return;
 
@@ -45,24 +79,20 @@ export default class DofusSocket extends Duplex {
             let pushOk = this.push(rawPacket);
 
             // pause reading if consumer is slow
-            if (!pushOk) this._readingPaused = true;
+            if (!pushOk) this._readingPaused = true;*/
         }
     }
     _read() {
         this._readingPaused = false;
         setImmediate(this._onReadable.bind(this));
     }
-    _write(msg: Message, encoding: string, cb: Function) {
-        /*let json = JSON.stringify(obj);
-        let jsonBytes = Buffer.byteLength(json);
-        let buffer = Buffer.alloc(4 + jsonBytes);
-        buffer.writeUInt32BE(jsonBytes);
-        buffer.write(json, 4);*/
+    /*_write(msg: Message, encoding: string, cb: Function) {
+ 
         const rawMsg = msg.pack()
         const header = new Header(msg.protocolId, 0, 0)
         header.length = rawMsg.length
         this._socket.write(Buffer.concat([header.toRaw(), rawMsg]));
-    }
+    }*/
     _final() {
         this._socket.end();
     }

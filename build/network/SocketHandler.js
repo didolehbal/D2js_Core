@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var PacketHandler_1 = __importDefault(require("./PacketHandler"));
+var DofusSocket_1 = __importDefault(require("./DofusSocket"));
 var SocketHandler = /** @class */ (function () {
     function SocketHandler(client, server, messagesToHandle) {
         var _this = this;
@@ -17,9 +17,10 @@ var SocketHandler = /** @class */ (function () {
                 }
             });
             server.on("data", function (data) {
-                var packetHandler = new PacketHandler_1.default("Server", _this._MessagesToHandle);
-                var processedData = packetHandler.processChunk(data);
-                var flushed = client.write(processedData);
+                console.log("===== new Chunk length " + data.length + " ======");
+                //let packetHandler   = new PacketHandler("Server", this._MessagesToHandle);
+                //let processedData = packetHandler.processChunk(data)
+                var flushed = client.write(data);
                 if (!flushed) {
                     console.log(" client not flushed; pausing local");
                     server.pause();
@@ -35,13 +36,13 @@ var SocketHandler = /** @class */ (function () {
             server.on('drain', function () {
                 client.resume();
             });
-            server.on('close', function (had_error) {
-                console.log("disconected");
+            server.on('close', function (hadError) {
+                console.log("disconected", hadError);
                 client.end();
             });
         };
         this.client = client;
-        this.server = server;
+        this.server = new DofusSocket_1.default(server);
         this._MessagesToHandle = messagesToHandle;
     }
     return SocketHandler;
