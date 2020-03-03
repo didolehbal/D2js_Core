@@ -30,9 +30,13 @@ export default class DofusSocket extends Duplex {
             if(!rawHiHeader)
                 return;
 
-            const hiHeader = rawHiHeader.readInt16BE(0)
+            const hiHeader = rawHiHeader.readUInt16BE(0)
             const packetID =  hiHeader >> 2
             const lenType = hiHeader & 3
+
+            if(lenType > 3 || lenType < 0){
+                throw new Error("Invalide LenType value : " +lenType)
+            }
 
             let rawLength:Buffer = Buffer.alloc(0)
             let length = 0
@@ -42,7 +46,7 @@ export default class DofusSocket extends Duplex {
                     this._socket.unshift(rawHiHeader)
                     return
                 }
-                length = rawLength.readIntBE(0,lenType)
+                length = rawLength.readUIntBE(0,lenType)
             }
 
             const header = new Header(packetID, lenType, length)
@@ -53,46 +57,26 @@ export default class DofusSocket extends Duplex {
                 this._socket.unshift(Buffer.concat([rawHiHeader,rawLength]))
                 return
             }
-            const rawPacket = Buffer.concat([header.toRaw(), rawMsg])
-            let pushOk = this.push(rawPacket);
+            
+            const packet = {
+                header,
+                rawMsg
+            }
+            let pushOk = this.push(packet);
 
             // pause reading if consumer is slow
             if (!pushOk) this._readingPaused = true;
 
-        /*    const rawHeader: Buffer = this._socket.read(5)
-            if (!rawHeader)
-                return;
-
-            const header = Header.fromRaw(rawHeader)
-
-            const howMuchLeftFromHeader = 5 - 2 - header.lenType
-            const whatLeftFromHeader = rawHeader.slice(howMuchLeftFromHeader)
-            const restOfRawMsg = this._socket.read(header.length - howMuchLeftFromHeader)
-
-            if (!restOfRawMsg) {
-                this._socket.unshift(rawHeader)
-                return
-            }
-            const rawMsg = Buffer.concat([whatLeftFromHeader, restOfRawMsg])
-
-            const rawPacket = Buffer.concat([header.toRaw(), rawMsg])
-            let pushOk = this.push(rawPacket);
-
-            // pause reading if consumer is slow
-            if (!pushOk) this._readingPaused = true;*/
+        
         }
     }
     _read() {
         this._readingPaused = false;
         setImmediate(this._onReadable.bind(this));
     }
-    /*_write(msg: Message, encoding: string, cb: Function) {
- 
-        const rawMsg = msg.pack()
-        const header = new Header(msg.protocolId, 0, 0)
-        header.length = rawMsg.length
-        this._socket.write(Buffer.concat([header.toRaw(), rawMsg]));
-    }*/
+    _write(data: Buffer, encoding: string, cb: Function) {
+        this._socket.write(data);
+    }
     _final() {
         this._socket.end();
     }

@@ -1,7 +1,8 @@
 import { Socket } from "net";
-import PacketHandler from "./PacketHandler"
 import Message from "../ankama/Message";
 import DofusSocket from "./DofusSocket"
+import SelectedServerDataExtendedMessage from "../ankama/SelectedServerDataExtendedMessage";
+import SelectedServerDataMessage from "../ankama/SelectedServerDataMessage";
 
 export default class SocketHandler {
     private client: Socket;
@@ -19,17 +20,34 @@ export default class SocketHandler {
         client.on("data", (data) => {
             var flushed = server.write(data);
             if (!flushed) {
-                console.log(" server not flushed; pausing local");
+                console.log("server not flushed; pausing local");
                 server.pause();
             }
 
         })
 
-        server.on("data", (data) => {
-            console.log(`===== new Chunk length ${data.length} ======` )
+        server.on("data", ({header,rawMsg}) => {
+            console.log(`===== packet ${header.packetID} length ${header.length} ======` )
             //let packetHandler   = new PacketHandler("Server", this._MessagesToHandle);
             //let processedData = packetHandler.processChunk(data)
-            var flushed = client.write(data);
+            let msg :Message
+            switch(header.packetID){
+                case 6469:
+                    msg= new  SelectedServerDataExtendedMessage()
+                    msg.unpack(rawMsg,0)
+                    msg.alterMsg()
+                    rawMsg = msg.pack()
+                break;
+                case 42:
+                    msg = new  SelectedServerDataMessage()
+                    msg.unpack(rawMsg,0)
+                    msg.alterMsg()
+                    rawMsg = msg.pack()
+                    break;
+            }
+
+            const rawPacket = Buffer.concat([header.toRaw(), rawMsg])
+            var flushed = client.write(rawPacket);
             if (!flushed) {
                 console.log(" client not flushed; pausing local");
                 server.pause();
