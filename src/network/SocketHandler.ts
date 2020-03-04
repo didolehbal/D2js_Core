@@ -3,6 +3,12 @@ import Message from "../ankama/Message";
 import DofusSocket from "./DofusSocket"
 import SelectedServerDataExtendedMessage from "../ankama/SelectedServerDataExtendedMessage";
 import SelectedServerDataMessage from "../ankama/SelectedServerDataMessage";
+import PROTOCOL from "./protocol.json"
+
+const msg_from_id = PROTOCOL.msg_from_id as Anything
+interface Anything {
+    [key: string]: any;
+  }
 
 export default class SocketHandler {
     private client: Socket;
@@ -26,28 +32,36 @@ export default class SocketHandler {
         })
 
         server.on("data", ({header,rawMsg}) => {
-            console.log(`===== packet ${header.packetID} length ${header.length} ======` )
-            //let packetHandler   = new PacketHandler("Server", this._MessagesToHandle);
-            //let processedData = packetHandler.processChunk(data)
+
+            if(!header){
+                console.log("contourning RDM...")
+                var flushed = client.write(rawMsg);
+                if (!flushed) {
+                    console.log(" client not flushed; pausing local");
+                    server.pause();
+                }
+            }
+
+            const packetName:any = msg_from_id[header.packetID]
+
+            console.log(`===== packet ${packetName}+${header.packetID} length ${header.length} ======` )
+
             let msg :Message
             switch(header.packetID){
-                case 6469:
+                case SelectedServerDataExtendedMessage.protocolId:
                     msg= new  SelectedServerDataExtendedMessage()
                     msg.unpack(rawMsg,0)
                     msg.alterMsg()
                     rawMsg = msg.pack()
                     header.length = rawMsg.length
                 break;
-                case 42:
+                case SelectedServerDataMessage.protocolId:
                     msg = new  SelectedServerDataMessage()
                     msg.unpack(rawMsg,0)
                     msg.alterMsg()
                     rawMsg = msg.pack()
                     header.length = rawMsg.length
                     break;
-                case 6253:
-                    client.write(rawMsg);
-                    return;
             }
 
             const rawPacket = Buffer.concat([header.toRaw(), rawMsg])

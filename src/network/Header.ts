@@ -52,7 +52,7 @@ export default class Header {
         if (this._lenType > 3)
             throw Error("lentype Exceeded 3")
 
-        headBff.writeInt16BE((this._packetID << 2) + this._lenType, 0)
+        headBff.writeInt16BE(this._packetID << 2 | this._lenType, 0)
         rawHeader = Buffer.concat([rawHeader, headBff])
 
         if (this._lenType > 0) {
@@ -64,10 +64,16 @@ export default class Header {
     }
 
     private lengthTypeFromLength(length: number): number {
-        let lenType = 0
-        for (let b = this._length; b != 0; b = b >>> 8) //logical shift by 8 bits
-            lenType++;
-        return lenType
+        if (length > 65535) {
+            return 3;
+        }
+        if (length > 255) {
+            return 2;
+        }
+        if (length > 0) {
+            return 1;
+        }
+        return 0;
     }
 
     public headerByteLength(): number {

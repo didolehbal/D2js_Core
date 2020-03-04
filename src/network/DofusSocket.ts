@@ -50,23 +50,24 @@ export default class DofusSocket extends Duplex {
             }
 
             const header = new Header(packetID, lenType, length)
-            console.log(header)
 
-            if (header.packetID === 6253) { //RDM
-                let rl = 0;
-                while (rl < header.length) {
-                    let raw = this._socket.read()
-                    if (rl == 0)
-                        raw = Buffer.concat([header.toRaw(), raw])
-                    rl += raw.length
-                    // i should write directly to client
-                    this.push({
-                        header,
-                        rawMsg: raw
-                    });
-                }
-                console.log("RDM DONE")
-                return
+            if (packetID === 6253) {
+                this.push({header:null,rawMsg:Buffer.concat([rawHiHeader,rawLength])})
+                do {
+
+                    const rawHiHeader: Buffer = this._socket.read(2)
+                    if (!rawHiHeader)
+                        return;
+
+                    const hiHeader = rawHiHeader.readUInt16BE(0)
+                    const packetID = hiHeader >> 2
+
+                    if(packetID == 6100){
+                        this._socket.unshift(rawHiHeader);
+                        return
+                    }
+                    this.push({header:null,rawMsg:rawHiHeader})
+                } while (true);
             }
 
             let rawMsg: Buffer = Buffer.alloc(0)
