@@ -61,10 +61,18 @@ export default class DofusSocket extends Duplex {
 
                     const hiHeader = rawHiHeader.readUInt16BE(0)
                     const packetID = hiHeader >> 2
-
-                    if(packetID === 6100){
+                    const lenTyoe = hiHeader | 3
+                    
+                    const rawLength:Buffer = this._socket.read(lenTyoe)
+                    if(!rawLength){
+                        this._socket.unshift(rawHiHeader)
+                        return
+                    }
+                    const length = rawLength.readIntBE(0,lenTyoe)
+                    
+                    if(hiHeader.valueOf() == 0x5f51 && length === 4){
                         console.log("PACKET FOUND "+packetID)
-                        this._socket.unshift(rawHiHeader);
+                        this._socket.unshift(Buffer.concat([rawHiHeader,rawLength]));
                         return
                     }
                     this.push({header:null,rawMsg:rawHiHeader})
