@@ -40,11 +40,12 @@ export default class SocketHandler {
                     console.log(" client not flushed; pausing local");
                     server.pause();
                 }
+                return
             }
 
-            const packetName:any = msg_from_id[header.packetID]
+            const packetName:any = msg_from_id[header.packetID].name
 
-            console.log(`===== packet ${packetName}+${header.packetID} length ${header.length} ======` )
+            console.log(`===== packet name ${packetName} id ${header.packetID} length ${header.length} ======` )
 
             let msg :Message
             switch(header.packetID){
