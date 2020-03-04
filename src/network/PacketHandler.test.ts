@@ -6,7 +6,9 @@ interface Anything {
   }
 
 test("does work",()=>{
-    const name ="6469"
+    const name =6100
     const packetName = msg_from_id[name].name
-    expect(packetName).toEqual("SelectedServerDataExtendedMessage")
+    console.log(packetName)
+    expect(packetName).toEqual("QueueStatusMessage")
+    
 })
