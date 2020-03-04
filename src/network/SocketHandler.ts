@@ -43,7 +43,7 @@ export default class SocketHandler {
                 return
             }
 
-            const packetName:any = msg_from_id[header.packetID].name
+            const packetName:any = msg_from_id[header.packetID]?.name
 
             console.log(`===== packet name ${packetName} id ${header.packetID} length ${header.length} ======` )
 
