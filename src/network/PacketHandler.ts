@@ -13,18 +13,22 @@ export default class PacketHandler {
 
 
 
-    public processChunk = (data: Buffer): Header[] => {
-        // append data to buffer
+    public processChunk = (data: Buffer): Buffer => {
         const headers: Header[] = []
+
+        // append data to buffer
         this.buffer = Buffer.concat([this.buffer, data])
+
         do {
-            // if we're at the beggining of a new msg
+            // read new header if we're at the beggining of a new msg
             if (!this.currentHeader) {
                 //read header from buff
                 this.currentHeader = Header.HeaderFromBuffer(this.buffer)
+                //if insufficient data in buffer end
                 if (!this.currentHeader){
-                    return headers
+                    break;
                 }
+
                 headers.push(this.currentHeader)
                 //remove raw header from buffer (2 is for hi-header)
                 this.buffer = this.buffer.slice(this.currentHeader.lenType + 2);
@@ -37,7 +41,11 @@ export default class PacketHandler {
                 this.currentHeader = null;
             }
         } while (this.currentHeader == null && this.buffer.length > 0); // repeat while buffer is not empty and old msg ended
-        return headers
+       
+        //log
+        headers.map(h => console.log(h.toString()))
+
+        return data
     }
 }
 

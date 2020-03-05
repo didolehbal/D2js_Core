@@ -40,13 +40,9 @@ export default class SocketHandler {
         })
 
         server.on("data", (data) => {
-            const headers: Header[] = this.serverPacketHandler.processChunk(data)
+            const processedData:Buffer = this.serverPacketHandler.processChunk(data)
 
-            headers.map(header => {
-                console.log(header.toString())
-            })
-
-            this.sendToClient(data)
+            this.sendToClient(processedData)
 
             /* let msg :Message
              switch(header.packetID){
