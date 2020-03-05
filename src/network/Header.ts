@@ -1,14 +1,22 @@
 import { Socket } from "net"
+import {msg_from_id} from "./protocol.json"
+import PacketHandler from "./PacketHandler";
+
+const getMsgFromId = msg_from_id as Anything
+interface Anything {
+    [key: string]: any;
+  }
 
 export default class Header {
     private _packetID: number;
     private _lenType: number;
     private _length: number;
-
+    private _name: string;
     constructor(packetID: number, lenType: number, length: number) {
         this._packetID = packetID;
         this._lenType = lenType;
         this._length = length;
+        this._name = getMsgFromId[this._packetID]
     }
 
     get packetID(): number {
@@ -103,6 +111,32 @@ export default class Header {
                 return null;
             }
             length = rawLength.readUIntBE(0, lenType)
+        }
+
+        const header = new Header(packetID, lenType, length)
+        return header;
+    }
+
+    public toString():string{
+        return `===== packet name ${this._name} id ${this.packetID} length ${this.length} ======`
+    }
+    public static HeaderFromBuffer(data: Buffer): Header | null {
+        if (data.length < 2)
+            return null
+        const hiHeader = data.readUInt16BE(0)
+        const packetID = hiHeader >> 2
+        const lenType = hiHeader & 3
+
+        if (lenType > 3 || lenType < 0) {
+            throw new Error("Invalide LenType value : " + lenType)
+        }
+
+        if (data.length < 2 + lenType)
+            return null
+
+        let length = 0
+        if (lenType > 0) {
+            length = data.readUIntBE(2, lenType)
         }
 
         const header = new Header(packetID, lenType, length)

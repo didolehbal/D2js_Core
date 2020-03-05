@@ -3,25 +3,21 @@ import Message from "../ankama/Message";
 import DofusSocket from "./DofusSocket"
 import SelectedServerDataExtendedMessage from "../ankama/SelectedServerDataExtendedMessage";
 import SelectedServerDataMessage from "../ankama/SelectedServerDataMessage";
-import PROTOCOL from "./protocol.json"
-
-const msg_from_id = PROTOCOL.msg_from_id as Anything
-interface Anything {
-    [key: string]: any;
-  }
+import PacketHandler from "./PacketHandler";
+import Header from "./Header";
 
 export default class SocketHandler {
     private client: Socket;
-    private server: DofusSocket;
+    private server: Socket;
     private _MessagesToHandle: Message[]
-    
+    private serverPacketHandler: PacketHandler = new PacketHandler()
     constructor(client: Socket, server: Socket, messagesToHandle: Message[]) {
         this.client = client;
-        this.server = new DofusSocket(server);
+        this.server = server;
         this._MessagesToHandle = messagesToHandle
     }
 
-    public sendToClient = (data:Buffer) => {
+    public sendToClient = (data: Buffer) => {
         let flushed = this.client.write(data);
         if (!flushed) {
             console.log("/!\ client not flushed; pausing local");
@@ -29,7 +25,7 @@ export default class SocketHandler {
         }
     }
 
-    public sendToServer = (data:Buffer) => {
+    public sendToServer = (data: Buffer) => {
         let flushed = this.server.write(data);
         if (!flushed) {
             console.log("/!\ server not flushed; pausing local");
@@ -43,41 +39,33 @@ export default class SocketHandler {
             this.sendToServer(data)
         })
 
-        server.on("data", ({header,rawMsg, restOfMsg}) => {
+        server.on("data", (data) => {
+            const headers: Header[] = this.serverPacketHandler.processChunk(data)
 
-            if(restOfMsg){
-                this.sendToClient(restOfMsg)
-                return
-            }
+            headers.map(header => {
+                console.log(header.toString())
+            })
 
-            const packetName:any = msg_from_id[header.packetID]?.name
+            this.sendToClient(data)
 
-            console.log(`===== packet name ${packetName} id ${header.packetID} length ${header.length} ======` )
-
-            let msg :Message
-            switch(header.packetID){
-                case SelectedServerDataExtendedMessage.protocolId:
-                    msg= new  SelectedServerDataExtendedMessage()
-                    msg.unpack(rawMsg,0)
-                    msg.alterMsg()
-                    rawMsg = msg.pack()
-                    header.length = rawMsg.length
-                break;
-                case SelectedServerDataMessage.protocolId:
-                    msg = new  SelectedServerDataMessage()
-                    msg.unpack(rawMsg,0)
-                    msg.alterMsg()
-                    rawMsg = msg.pack()
-                    header.length = rawMsg.length
-                    break;
-            }
-
-            const rawPacket = Buffer.concat([header.toRaw(), rawMsg])
-            var flushed = client.write(rawPacket);
-            if (!flushed) {
-                console.log(" client not flushed; pausing local");
-                server.pause();
-            }
+            /* let msg :Message
+             switch(header.packetID){
+                 case SelectedServerDataExtendedMessage.protocolId:
+                     msg= new  SelectedServerDataExtendedMessage()
+                     msg.unpack(rawMsg,0)
+                     msg.alterMsg()
+                     rawMsg = msg.pack()
+                     header.length = rawMsg.length
+                 break;
+                 case SelectedServerDataMessage.protocolId:
+                     msg = new  SelectedServerDataMessage()
+                     msg.unpack(rawMsg,0)
+                     msg.alterMsg()
+                     rawMsg = msg.pack()
+                     header.length = rawMsg.length
+                     break;
+             }
+             */
 
         })
 
@@ -94,8 +82,8 @@ export default class SocketHandler {
             client.resume();
         });
 
-        server.on('close', function (hadError:any) {
-            console.log("disconected",hadError)
+        server.on('close', function (hadError: any) {
+            console.log("disconected", hadError)
             client.end();
         });
     }

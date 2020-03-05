@@ -7,6 +7,8 @@ export default class DofusSocket extends Duplex {
     private _readingPaused: boolean;
     private _socket: Socket;
 
+    private currentMsgHeader: Header | null = null
+    private currentMsgIndex: number = 0
     constructor(socket: Socket) {
         super({ objectMode: true });
         this._readingPaused = false;
@@ -27,34 +29,47 @@ export default class DofusSocket extends Duplex {
     }
 
     _onReadable() {
+        let { currentMsgHeader: header } = this
         while (!this._readingPaused) {
-            const header = Header.HeaderFromStream(this._socket)
-            if(!header)
-                return
-            
+            // reading header if available 
+            if (!header) {
+                header = Header.HeaderFromStream(this._socket)
+                if (!header)
+                    return
+            }
+
             let rawMsg: Buffer = Buffer.alloc(0)
-            
+
             if (header.length > 0) {
+
                 const count = Math.floor(header.length / 1024)
-                for (let i = 0; i < count; i++) {
+                for (let i = this.currentMsgIndex; i < count; i++) { // starting from the last index 
+
+                    this.currentMsgIndex = i; // we set new index
 
                     rawMsg = this._socket.read(1024)
                     if (!rawMsg) {
-                        i--
-                        continue
+                        return;
                     }
-                    if (i == 0) {
+                    if (!this.currentMsgHeader) {
+                        this.currentMsgHeader = header; // set the header we are currently working on and push it to dest
                         this.push({ header, rawMsg })
                     }
                     else
                         this.push({ restOfMsg: rawMsg })
                 }
-                if(header.length % 1024 > 0){
-                    do {
-                        rawMsg = this._socket.read(header.length % 1024)
-                    } while (!rawMsg);
+                let rest = header.length % 1024
+                if (rest > 0) {
+                    rawMsg = this._socket.read(rest)
+                    if (!rawMsg)
+                        return
+                    this.currentMsgHeader = null;
+                    this.currentMsgIndex = 0;
                     this.push({ restOfMsg: rawMsg })
                 }
+            }
+            else {
+                this.push({ header, rawMsg })
             }
 
         }
