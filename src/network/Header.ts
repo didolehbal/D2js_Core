@@ -1,3 +1,4 @@
+import { Socket } from "net"
 
 export default class Header {
     private _packetID: number;
@@ -78,5 +79,33 @@ export default class Header {
 
     public headerByteLength(): number {
         return 2 + this._lenType
+    }
+
+    public static HeaderFromStream(socket: Socket): Header | null {
+        const rawHiHeader: Buffer = socket.read(2)
+        if (!rawHiHeader)
+            return null;
+
+        const hiHeader = rawHiHeader.readUInt16BE(0)
+        const packetID = hiHeader >> 2
+        const lenType = hiHeader & 3
+
+        if (lenType > 3 || lenType < 0) {
+            throw new Error("Invalide LenType value : " + lenType)
+        }
+
+        let rawLength: Buffer = Buffer.alloc(0)
+        let length = 0
+        if (lenType > 0) {
+            rawLength = socket.read(lenType)
+            if (!rawLength) {
+                socket.unshift(rawHiHeader)
+                return null;
+            }
+            length = rawLength.readUIntBE(0, lenType)
+        }
+
+        const header = new Header(packetID, lenType, length)
+        return header;
     }
 }

@@ -20,26 +20,33 @@ export default class SocketHandler {
         this.server = new DofusSocket(server);
         this._MessagesToHandle = messagesToHandle
     }
+
+    public sendToClient = (data:Buffer) => {
+        let flushed = this.client.write(data);
+        if (!flushed) {
+            console.log("/!\ client not flushed; pausing local");
+            this.server.pause();
+        }
+    }
+
+    public sendToServer = (data:Buffer) => {
+        let flushed = this.server.write(data);
+        if (!flushed) {
+            console.log("/!\ server not flushed; pausing local");
+            this.client.pause();
+        }
+    }
+
     public start = () => {
         const { server, client } = this;
         client.on("data", (data) => {
-            var flushed = server.write(data);
-            if (!flushed) {
-                console.log("server not flushed; pausing local");
-                server.pause();
-            }
-
+            this.sendToServer(data)
         })
 
-        server.on("data", ({header,rawMsg}) => {
+        server.on("data", ({header,rawMsg, restOfMsg}) => {
 
-            if(!header){
-                console.log("contourning RDM...")
-                var flushed = client.write(rawMsg);
-                if (!flushed) {
-                    console.log(" client not flushed; pausing local");
-                    server.pause();
-                }
+            if(restOfMsg){
+                this.sendToClient(restOfMsg)
                 return
             }
 

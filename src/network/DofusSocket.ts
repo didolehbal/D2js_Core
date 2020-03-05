@@ -6,12 +6,14 @@ import Message from '../ankama/Message';
 export default class DofusSocket extends Duplex {
     private _readingPaused: boolean;
     private _socket: Socket;
+
     constructor(socket: Socket) {
         super({ objectMode: true });
         this._readingPaused = false;
         this._socket = socket;
         this._initSocket()
     }
+
     private _initSocket() {
         this._socket.on('close', hadError => this.emit('close', hadError));
         this._socket.on('connect', () => this.emit('connect'));
@@ -23,80 +25,38 @@ export default class DofusSocket extends Duplex {
         this._socket.on('timeout', () => this.emit('timeout'));
         this._socket.on('readable', this._onReadable.bind(this));
     }
+
     _onReadable() {
         while (!this._readingPaused) {
-
-            const rawHiHeader: Buffer = this._socket.read(2)
-            if (!rawHiHeader)
-                return;
-
-            const hiHeader = rawHiHeader.readUInt16BE(0)
-            const packetID = hiHeader >> 2
-            const lenType = hiHeader & 3
-
-            if (lenType > 3 || lenType < 0) {
-                throw new Error("Invalide LenType value : " + lenType)
-            }
-
-            let rawLength: Buffer = Buffer.alloc(0)
-            let length = 0
-            if (lenType > 0) {
-                rawLength = this._socket.read(lenType)
-                if (!rawLength) {
-                    this._socket.unshift(rawHiHeader)
-                    return
-                }
-                length = rawLength.readUIntBE(0, lenType)
-            }
-
-            const header = new Header(packetID, lenType, length)
-
-            if (packetID === 6253) {
-                this.push({header:null,rawMsg:Buffer.concat([rawHiHeader,rawLength])})
-                do {
-
-                    const rawHiHeader: Buffer = this._socket.read(2)
-                    if (!rawHiHeader)
-                        return;
-
-                    const hiHeader = rawHiHeader.readUInt16BE(0)
-                    const packetID = hiHeader >> 2
-                    const lenTyoe = hiHeader | 3
-                    
-                    const rawLength:Buffer = this._socket.read(lenTyoe)
-                    if(!rawLength){
-                        this._socket.unshift(rawHiHeader)
-                        return
-                    }
-                    const length = rawLength.readIntBE(0,lenTyoe)
-                    
-                    if(hiHeader.valueOf() == 0x5f51 && length === 4){
-                        console.log("PACKET FOUND "+packetID)
-                        this._socket.unshift(Buffer.concat([rawHiHeader,rawLength]));
-                        return
-                    }
-                    this.push({header:null,rawMsg:rawHiHeader})
-                } while (true);
-            }
-
+            const header = Header.HeaderFromStream(this._socket)
+            if(!header)
+                return
+            
             let rawMsg: Buffer = Buffer.alloc(0)
+            
             if (header.length > 0) {
-                rawMsg = this._socket.read(header.length)
-                if (!rawMsg) {
-                    console.log("unshift " + header.length)
-                    this._socket.unshift(Buffer.concat([rawHiHeader, rawLength]))
-                    return
+                const count = Math.floor(header.length / 1024)
+                for (let i = 0; i < count; i++) {
+
+                    rawMsg = this._socket.read(1024)
+                    if (!rawMsg) {
+                        i--
+                        continue
+                    }
+                    if (i == 0) {
+                        this.push({ header, rawMsg })
+                    }
+                    else
+                        this.push({ restOfMsg: rawMsg })
+                }
+                if(header.length % 1024 > 0){
+                    do {
+                        rawMsg = this._socket.read(header.length % 1024)
+                    } while (!rawMsg);
+                    this.push({ restOfMsg: rawMsg })
                 }
             }
 
-            const packet = {
-                header,
-                rawMsg
-            }
-            let pushOk = this.push(packet);
-
-            // pause reading if consumer is slow
-            if (!pushOk) this._readingPaused = true;
         }
     }
     _read() {
