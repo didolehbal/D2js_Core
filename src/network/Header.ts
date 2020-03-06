@@ -9,14 +9,13 @@ interface Anything {
 
 export default class Header {
     private _packetID: number;
-    private _lenType: number;
-    private _length: number;
+    private _lenType: number =0;
+    private _length: number =0;
     private _name: string;
-    constructor(packetID: number, lenType: number, length: number) {
+    constructor(packetID: number, length: number) {
         this._packetID = packetID;
-        this._lenType = lenType;
-        this._length = length;
-        this._name = getMsgFromId[this._packetID]
+        this.length = length;
+        this._name = getMsgFromId[this._packetID]?.name
     }
 
     get packetID(): number {
@@ -51,7 +50,7 @@ export default class Header {
             length = data.readIntBE(offset + 2, lenType)
         }
 
-        return new Header(packetID, lenType, length);
+        return new Header(packetID, length);
     }
 
     public toRaw(): Buffer {
@@ -113,7 +112,7 @@ export default class Header {
             length = rawLength.readUIntBE(0, lenType)
         }
 
-        const header = new Header(packetID, lenType, length)
+        const header = new Header(packetID, length)
         return header;
     }
 
@@ -139,7 +138,7 @@ export default class Header {
             length = data.readUIntBE(2, lenType)
         }
 
-        const header = new Header(packetID, lenType, length)
+        const header = new Header(packetID, length)
         return header;
     }
 }
