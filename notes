@@ -1,2 +1,12 @@
 dofus game server IPs:
 172.65.202.113
+UpdateMapPlayersAgressableStatusMessage 
+GameMapMovementMessage : when player or
+
+ GameRolePlayShowActorMessage id 5632 length 85 ======
+===== packet name UpdateMapPlayersAgressableStatusMessage id 6454 length 10 ======
+===== packet name SetCharacterRestrictionsMessage
+
+GameRolePlayShowActorMessage id 5632 length 82 ======
+===== packet name UpdateMapPlayersAgressableStatusMessage id 6454 length 10 ======
+===== packet name SetCharacterRestrictionsMessage id 170 le

@@ -1,6 +1,5 @@
 import { Socket } from "net"
 import {msg_from_id} from "./protocol.json"
-import PacketHandler from "./PacketHandler";
 
 const getMsgFromId = msg_from_id as Anything
 interface Anything {

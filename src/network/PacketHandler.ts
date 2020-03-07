@@ -1,37 +1,23 @@
 import Message from "../ankama/Message";
 import Header from "./Header"
-import SelectedServerDataExtendedMessage from "../ankama/SelectedServerDataExtendedMessage";
-import SelectedServerDataMessage from "../ankama/SelectedServerDataMessage";
+import {factory} from "../utils/Logger"
 
-class ProtocolRequired extends Message {
-    constructor() {
-        super(1)
-    }
-    public unpack(data: Buffer, offset: number): import("./CustomDataWraper").CustomDataWrapper | null {
-        return null
-        //throw new Error("Method not implemented.");
-    }
-    public pack(): Buffer {
-        return Buffer.from("000007a7000007bb", "hex")
-        //throw new Error("Method not implemented.");
-    }
-    public alterMsg(): void {
-        //throw new Error("Method not implemented.");
-    }
-    public toString(): string {
-        throw new Error("Method not implemented.");
-    }
-}
+
 export default class PacketHandler {
 
-    private messageToAlterOffset: number = -1
     private message: Message | null = null;
     private offset: number = 0
     private buffer: Buffer = Buffer.alloc(0);
     private currentHeader: Header | null = null
     private messagesToAlter: Message[];
-    constructor() {
-        this.messagesToAlter = [new SelectedServerDataExtendedMessage(), new SelectedServerDataMessage()]
+    private log:any
+    private name :string
+
+    constructor(messagesToAlter :Message[], name: string) {
+        this.messagesToAlter = messagesToAlter
+        this.name = name
+        this.log = factory.getLogger(name);
+        
     }
 
 
@@ -71,23 +57,13 @@ export default class PacketHandler {
             if (this.buffer.length >= this.currentHeader.length) {
                 //remove message from data to append it altered later
                 if (this.message) {
-                    /*   console.log(this.offset,
-                           this.offset + this.currentHeader.length + 2 + this.currentHeader.lenType,
-                           data.slice(0, this.offset),
-                           data.slice(this.offset + this.currentHeader.length + 2 + this.currentHeader.lenType))*/
-
                     //raw message unmodified
                     let rawMessage = data.slice(this.offset, this.offset + this.currentHeader.length + 2 + this.currentHeader.lenType)
-                    console.log(rawMessage)
-
-                    /*data = Buffer.concat([data.slice(0, this.offset),
-                    data.slice(this.offset + this.currentHeader.length + 2 + this.currentHeader.lenType)])*/
 
                     this.message.unpack(rawMessage, this.currentHeader.lenType + 2)
                     this.message.alterMsg()
                     //raw message after modification
                     rawMessage = this.message.pack()
-                    console.log(rawMessage)
 
                     const newHeader = new Header(this.currentHeader.packetID, rawMessage.length)
                     data = Buffer.concat([
@@ -106,12 +82,11 @@ export default class PacketHandler {
                 this.currentHeader = null;
 
             }
-
         } while (this.currentHeader == null && this.buffer.length > 0); // repeat while buffer is not empty and old msg ended
 
 
         //log the headers
-        headers.map(h => console.log(h.toString()))
+        headers.map(h => this.log.debug(h.toString()))
 
         return data
     }

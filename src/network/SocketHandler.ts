@@ -10,11 +10,14 @@ export default class SocketHandler {
     private client: Socket;
     private server: Socket;
     private _MessagesToHandle: Message[]
-    private serverPacketHandler: PacketHandler = new PacketHandler()
+    private serverPacketHandler: PacketHandler;
+    private clientPacketHandler: PacketHandler;
     constructor(client: Socket, server: Socket, messagesToHandle: Message[]) {
         this.client = client;
         this.server = server;
         this._MessagesToHandle = messagesToHandle
+        this.serverPacketHandler = new PacketHandler([new SelectedServerDataExtendedMessage(),new SelectedServerDataMessage], "SERVER")
+        this.clientPacketHandler = new PacketHandler([], "CLIENT")
     }
 
     public sendToClient = (data: Buffer) => {
@@ -36,32 +39,13 @@ export default class SocketHandler {
     public start = () => {
         const { server, client } = this;
         client.on("data", (data) => {
-            this.sendToServer(data)
+            const processedData:Buffer = this.clientPacketHandler.processChunk(data)
+            this.sendToServer(processedData)
         })
 
         server.on("data", (data) => {
             const processedData:Buffer = this.serverPacketHandler.processChunk(data)
-
             this.sendToClient(processedData)
-
-            /* let msg :Message
-             switch(header.packetID){
-                 case SelectedServerDataExtendedMessage.protocolId:
-                     msg= new  SelectedServerDataExtendedMessage()
-                     msg.unpack(rawMsg,0)
-                     msg.alterMsg()
-                     rawMsg = msg.pack()
-                     header.length = rawMsg.length
-                 break;
-                 case SelectedServerDataMessage.protocolId:
-                     msg = new  SelectedServerDataMessage()
-                     msg.unpack(rawMsg,0)
-                     msg.alterMsg()
-                     rawMsg = msg.pack()
-                     header.length = rawMsg.length
-                     break;
-             }
-             */
 
         })
 

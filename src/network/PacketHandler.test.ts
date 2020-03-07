@@ -16,7 +16,7 @@ interface Anything {
 */
 
 test("processchunk works", () => {
-  const packetHandler = new PacketHandler();
+  const packetHandler = new PacketHandler([],"TEST");
   const data = Buffer.from("000508000007a7000007a701945f5104000100015f510400000000","hex")
  // const data2 = Buffer.from("945f5104000100015f510400000000","hex")
   let processedData = packetHandler.processChunk(data)
