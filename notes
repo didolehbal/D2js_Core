@@ -10,3 +10,16 @@ GameMapMovementMessage : when player or
 GameRolePlayShowActorMessage id 5632 length 82 ======
 ===== packet name UpdateMapPlayersAgressableStatusMessage id 6454 length 10 ======
 ===== packet name SetCharacterRestrictionsMessage id 170 le
+
+
+ [SERVER] ===== packet name GameRolePlayShowActorMessage id 5632 length 91 ======
+2020-03-07 13:27:25,093 DEBUG [SERVER] ===== packet name UpdateMapPlayersAgressableStatusMessage id 6454 length 10 ======
+2020-03-07 13:27:25,134 DEBUG [SERVER] ===== packet name SetCharacterRestrictionsMessage id 170 length 11 ======
+2020-03-07 13:27:27,057 DE
+
+
+ GameRolePlayShowActorMessage id 5632 length 89 ======
+2020-03-07 13:29:21,126 DEBUG [SERVER] ===== packet name GameRolePlayShowActorMessage id 5632 length 89 ======
+2020-03-07 13:29:21,138 DEBUG [SERVER] ===== packet name SetCharacterRestrictionsMessage id 170 length 11 ======
+2020-03-07 13:29:21,142 DEBUG [SERVER] ===== packet name GameMapMovementMessage id 951 length 16 ======
+2020-03-07 13:29:21,902 DEBUG [SERVER] ===== packet name UpdateMapPlayersAgressableStatusMessage id 6454 length 10 ======

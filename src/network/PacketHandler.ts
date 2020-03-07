@@ -2,6 +2,8 @@ import Message from "../ankama/Message";
 import Header from "./Header"
 import {factory} from "../utils/Logger"
 
+import fs from "fs"
+
 
 export default class PacketHandler {
 
@@ -75,7 +77,10 @@ export default class PacketHandler {
                 }
                 else
                     this.offset += this.currentHeader.length + 2 + this.currentHeader.lenType
-
+                if(this.currentHeader.packetID === 5632){
+                    let rawMessage = data.slice(this.offset, this.offset + this.currentHeader.length + 2 + this.currentHeader.lenType)
+                    fs.appendFile("log.txt",rawMessage.toString() + "\n",()=> this.log("append to fs logs"))
+                }
                 // remove old msg content starting of the index of the next msg
                 this.buffer = this.buffer.slice(this.currentHeader.length)
                 //reset header to null
