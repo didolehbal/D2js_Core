@@ -31,7 +31,7 @@ export default class AuthProxy extends Proxy {
         typeName:"SelectedServerDataMessage",
         alter:function(data:any) {
             data.address = "localhost";
-            data.ports =[5555]
+            data.ports =[7778]
         },
         doInBackground:function(data:any){
             console.log(`redirected from ${data?.address} ${data?.ports} to localhost [5555]`)
@@ -42,9 +42,11 @@ export default class AuthProxy extends Proxy {
         typeName:"SelectedServerDataExtendedMessage",
         alter:function(data:any) {
             data.address = "localhost";
-            data.ports =[5555]
+            data.ports =[7778]
         },
-        doInBackground:null
+        doInBackground:function(data:any){
+            console.log(`redirected from ${data?.address} ${data?.ports} to localhost [5555]`)
+        }
     }
     const socketHandler = new SocketHandler(dofusClient, dofusServer,[msgAction1,msgAction2]);
     socketHandler.start()
