@@ -52,6 +52,7 @@ export default class PacketHandler {
                     if (this.currentHeader.packetID === this.msgsActions[i].protocolId) {
                         this.message = this.msgsActions[i]
                         console.log("msg found")
+                        break;
                     }
 
                 //push header to list of header to log it
@@ -62,7 +63,7 @@ export default class PacketHandler {
 
             // if buffer contains whole msg then
             if (this.buffer.length >= this.currentHeader.length) {
-                //updata msg raw data
+                //update msg raw data
                 if (this.message) {
                     //raw message unmodified
                     let rawMessage = this.buffer.slice(this.offset, this.offset + this.currentHeader.length + 2 + this.currentHeader.lenType)
@@ -85,7 +86,7 @@ export default class PacketHandler {
 
                     this.message = null
                 }
-                else
+                //else //??
                     this.offset += this.currentHeader.length + 2 + this.currentHeader.lenType
                 
                 // remove old msg content starting of the index of the next msg
