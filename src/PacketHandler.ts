@@ -62,10 +62,11 @@ export default class PacketHandler {
                     let rawMessage = data.slice(this.offset, this.offset + this.currentHeader.length + 2 + this.currentHeader.lenType)
 
                     let msgContent = deserialize(new CustomDataWrapper(rawMessage),this.message.protocolId)
+                    if(this.message.doInBackground != null)
+                        this.message.doInBackground(msgContent)
+
                     if(this.message.alter != null)
                         msgContent = this.message.alter(msgContent)
-                    if(this.message.doInBackground != null)
-                        this.message.doInBackground()
                     //raw message after modification
                     rawMessage = serialize(new CustomDataWrapper(),msgContent,this.message.protocolId)
 
