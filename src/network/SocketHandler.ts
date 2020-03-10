@@ -53,15 +53,15 @@ export default class SocketHandler {
         });
 
         client.on('close', function (had_error) {
-            console.log("disconected")
+            console.log("Client Disconnected",{error:had_error})
             server.end();
         });
         server.on('drain', function () {
             client.resume();
         });
 
-        server.on('close', function (hadError: any) {
-            console.log("disconected", hadError)
+        server.on('close', function (had_error: any) {
+            console.log("Server Disconnected",{error:had_error})
             client.end();
         });
     }

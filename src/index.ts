@@ -2,8 +2,9 @@ import Config from "./network/config.json"
 import axios from "axios"
 import AuthProxy from "./network/AuthProxy"
 import GameProxy from "./network/GameProxy.js"
-
-axios.put(`http://127.0.0.1:80/api/createandinject?exePath=${Config.DOFUS_PATH}`, {
+import {hook} from "./hook/hookers"
+import frida from "frida"
+/*axios.put(`http://127.0.0.1:80/api/createandinject?exePath=${Config.DOFUS_PATH}`, {
     RedirectionPort: Config.port,
     RedirectedIps: Config.authServerIps
 })
@@ -13,7 +14,8 @@ axios.put(`http://127.0.0.1:80/api/createandinject?exePath=${Config.DOFUS_PATH}`
     .catch(err => {
         console.error("Injection failed", err.response)
     })
-
+*/
+hook()
 const authProxy = new AuthProxy()
 authProxy.start()
 
