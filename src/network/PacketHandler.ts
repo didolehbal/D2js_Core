@@ -66,7 +66,7 @@ export default class PacketHandler {
                 //update msg raw data
                 if (this.message) {
                     //raw message unmodified
-                    let rawMessage = this.buffer.slice(this.offset, this.offset + this.currentHeader.length + 2 + this.currentHeader.lenType)
+                    let rawMessage = this.buffer.slice(0, this.currentHeader.length + 2 + this.currentHeader.lenType)
 
                     let msgContent = deserialize(new CustomDataWrapper(rawMessage),this.currentHeader.name)
                     if(this.message.doInBackground != null)
@@ -87,7 +87,7 @@ export default class PacketHandler {
                     this.message = null
                 }
                 //else //??
-                    this.offset += this.currentHeader.length + 2 + this.currentHeader.lenType
+                this.offset += this.currentHeader.length + 2 + this.currentHeader.lenType
                 
                 // remove old msg content starting of the index of the next msg
                 this.buffer = this.buffer.slice(this.currentHeader.length)
