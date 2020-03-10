@@ -32,8 +32,14 @@ export default class SocketHandler {
     public start = () => {
         const { server, client } = this;
         client.on("data", (data) => {
+            try{
             const processedData: Buffer = this.clientPacketHandler.processChunk(data)
             this.sendToServer(processedData)
+            }catch(ex){
+                console.trace(ex)
+                this.sendToServer(data)
+                this.clientPacketHandler.reset()
+            }
         })
 
         server.on("data", (data) => {
