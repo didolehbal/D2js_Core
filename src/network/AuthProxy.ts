@@ -2,8 +2,7 @@ import Proxy from "./Proxy";
 import {Socket} from "net"
 import Config from "./config.json"
 import SocketHandler from "./SocketHandler"
-import {MsgAction } from "./types"
-import { constants } from "buffer";
+import {MsgAction } from "../types"
 
 export default class AuthProxy extends Proxy {
     constructor() {

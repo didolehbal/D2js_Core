@@ -1,9 +1,9 @@
-import {getMsgFromId} from "./utils/Protocol"
-import PacketHandler from "./PacketHandler"
-import {MsgAction} from "./types"
-import { deserialize} from "./utils/Protocol"
-import Header from "./utils/Header"
-import CustomDataWrapper from "./utils/CustomDataWraper"
+import {getMsgFromId} from "../utils/Protocol"
+import PacketHandler from "../network/PacketHandler"
+import {MsgAction} from "../types"
+import { deserialize} from "../utils/Protocol"
+import Header from "../utils/Header"
+import CustomDataWrapper from "../utils/CustomDataWraper"
 /*test("does work",()=>{
     const name =6100
     const packetName = msg_from_id[name].name

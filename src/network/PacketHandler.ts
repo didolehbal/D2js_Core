@@ -1,10 +1,10 @@
-import Header from "./utils/Header"
-import { factory } from "./utils/Logger"
-import {deserialize, serialize} from "./utils/Protocol"
+import Header from "../utils/Header"
+import { factory } from "../utils/Logger"
+import {deserialize, serialize} from "../utils/Protocol"
 import fs from "fs"
 
-import {MsgAction} from "./types"
-import CustomDataWrapper from "./utils/CustomDataWraper"
+import {MsgAction} from "../types"
+import CustomDataWrapper from "../utils/CustomDataWraper"
 import { ConsoleLoggerImpl } from "typescript-logging"
 
 export default class PacketHandler {

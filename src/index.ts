@@ -1,7 +1,7 @@
-import Config from "./config.json"
+import Config from "./network/config.json"
 import axios from "axios"
-import AuthProxy from "./AuthProxy"
-import GameProxy from "./GameProxy.js"
+import AuthProxy from "./network/AuthProxy"
+import GameProxy from "./network/GameProxy.js"
 
 axios.put(`http://127.0.0.1:80/api/createandinject?exePath=${Config.DOFUS_PATH}`, {
     RedirectionPort: Config.port,

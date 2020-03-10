@@ -1,6 +1,6 @@
 import { Socket } from "net";
 import PacketHandler from "./PacketHandler";
-import { MsgAction } from "./types"
+import { MsgAction } from "../types"
 export default class SocketHandler {
     private client: Socket;
     private server: Socket;
