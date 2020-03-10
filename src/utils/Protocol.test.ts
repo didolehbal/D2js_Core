@@ -15,11 +15,11 @@ test("deserialize", () => {
 
   const dataWrapper = new CustomDataWrapper(rawBody)
 
-  let res = deserialize(dataWrapper, header.packetID)
+  let res = deserialize(dataWrapper, header.name)
   console.log(header.toString())
-  console.log(res)
+  //console.log(res)
   
-  let rawRes = serialize(new CustomDataWrapper(), res, header.packetID)
+  let rawRes = serialize(new CustomDataWrapper(), res, header.name)
 
   expect(rawRes.length).toEqual(rawBody.length)
   expect(rawBody).toEqual(rawRes)
@@ -68,19 +68,19 @@ test("read write AtomicVar", () => {
       desc: { type: "Byte", name: "test", length: "UnsignedShort", optional: false },
       value: [77,111,50]
     },
-    {
+  /*  {
       desc: { type: "VarLong", name: "test", length: "", optional: false },
       value: 12548
     },
     {
       desc: { type: "VarLong", name: "test", length: "UnsignedShort", optional: false },
       value: [124448,12544,1866]
-    },
+    },*/
   ]
 
   for (let i = 0; i < vars.length; i++) {
     let dataWrapper = new CustomDataWrapper()
-    writeAtomicType(dataWrapper,vars[i].desc,vars[i].value)
+    writeAtomicType(dataWrapper,vars[i].value, vars[i].desc)
 
     const res = readAtomicType(dataWrapper, vars[i].desc)
     expect(res).toEqual(vars[i].value)

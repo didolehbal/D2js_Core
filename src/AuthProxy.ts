@@ -28,6 +28,7 @@ export default class AuthProxy extends Proxy {
     
     const msgAction1 : MsgAction = {
         protocolId:6469,
+        typeName:"SelectedServerDataMessage",
         alter:function(data:any) {
             data.address = "localhost";
             data.ports =[5555]
@@ -38,6 +39,7 @@ export default class AuthProxy extends Proxy {
     }
     const msgAction2 : MsgAction = {
         protocolId:42,
+        typeName:"SelectedServerDataExtendedMessage",
         alter:function(data:any) {
             data.address = "localhost";
             data.ports =[5555]

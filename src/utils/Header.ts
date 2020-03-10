@@ -22,6 +22,9 @@ export default class Header {
     get length(): number {
         return this._length
     }
+    get name():string{
+        return this._name
+    }
 
     set packetID(id: number) {
         this._packetID = id

@@ -52,31 +52,22 @@ export function readAtomicType(data: CustomDataWrapper, desc: variable): {} {
     return result
 }
 
-export function deserialize(data: CustomDataWrapper, protocolId: number, typeId: number = -1): {} {
-    if (!data || protocolId == undefined) {
-        throw new Error("args missing !" + data + "" + protocolId)
+export function deserialize(data: CustomDataWrapper, typeName: string): {} {
+    if (!data || !typeName) {
+        throw new Error("args missing ! data:" + data + " typeName:" + typeName)
     }
     let result = {}
-    let msgSpec = null
-
-    if (typeId != -1)
-        msgSpec = getTypeFromId[typeId]
-    else
-        msgSpec = getMsgFromId[protocolId]
+    let msgSpec = getTypesFromName[typeName]
 
     if (!msgSpec) {
-        throw new Error("msgSpec missing ! protocolID:" + protocolId + " " + typeId)
+        throw new Error("msgSpec missing ! typeName: " + typeName)
     }
 
 
     //handle parent
     if (msgSpec.parent != null) {
-        const isMsg = msgSpec.parent.includes("Message")
-        let res
-        if (isMsg)
-            res = deserialize(data, getTypesFromName[msgSpec.parent].protocolId)
-        else
-            res = deserialize(data, 1, getTypesFromName[msgSpec.parent].protocolId)
+
+        const res = deserialize(data, msgSpec.parent)
         result = { ...result, ...res }
     }
 
@@ -84,7 +75,7 @@ export function deserialize(data: CustomDataWrapper, protocolId: number, typeId:
     if (msgSpec.boolVars.length > 0) {
         for (let j = 0; j < msgSpec.boolVars.length; j += 8) {
             let _box0: number = data.readByte();
-            for (let i = 0; i < 8 && i < msgSpec.boolVars.length / (j+1); i++) {
+            for (let i = 0; i < 8 && i < msgSpec.boolVars.length / (j + 1); i++) {
                 let bool1 = msgSpec?.boolVars[i];
                 result = {
                     ...result,
@@ -109,7 +100,7 @@ export function deserialize(data: CustomDataWrapper, protocolId: number, typeId:
                     let id = data.readUnsignedShort()
                     type = getTypeFromId[id].name
                 }
-                result = { ...result, ...deserialize(data, 1, getTypesFromName[type].protocolId) }
+                result = { ...result, ...deserialize(data, type) }
             }
             else {
                 const length = data.read(v.length)
@@ -120,7 +111,7 @@ export function deserialize(data: CustomDataWrapper, protocolId: number, typeId:
                         let id = data.readUnsignedShort()
                         type = getTypeFromId[id].name
                     }
-                    res.push(deserialize(data, 1, getTypesFromName[type].protocolId))
+                    res.push(deserialize(data, type))
                 }
                 result = { ...result, [v.name]: res }
             }
@@ -130,7 +121,9 @@ export function deserialize(data: CustomDataWrapper, protocolId: number, typeId:
     return result
 }
 
-export function writeAtomicType(data: CustomDataWrapper, desc: variable, value: any) {
+export function writeAtomicType(data: CustomDataWrapper, value: any, desc: variable) {
+    if(value == undefined)
+        throw new Error("value undefined")
     let length: any = 1;
     if (desc.length) {
         length = value.length
@@ -144,20 +137,29 @@ export function writeAtomicType(data: CustomDataWrapper, desc: variable, value: 
     }
 }
 
-export function serialize(dataWrapper: CustomDataWrapper = new CustomDataWrapper(), data: any, protocolId: number): Buffer {
-
-    let msgSpec = getMsgFromId[protocolId] || getTypeFromId[protocolId]
+export function serialize(dataWrapper: CustomDataWrapper = new CustomDataWrapper(), data: any, typeName: string): Buffer {
+    
     //console.log("serializing " + msgSpec.name + "\n")
 
-    if (msgSpec.parent != null) {
-        serialize(dataWrapper, data, getTypesFromName[msgSpec.parent].protocolId)
+    if (!typeName || !data) {
+        throw new Error("missing arg data: " + data + " typeName:" + typeName)
     }
 
-     //handle boolvars 8 by 8 (each boolvar is written in 1/8 byte)
-     if (msgSpec.boolVars.length > 0) {
+    let msgSpec = getTypesFromName[typeName]
+
+    if (!msgSpec) {
+        throw new Error("no msgSpec for : " + typeName)
+    }
+
+    if (msgSpec.parent != null) {
+        serialize(dataWrapper, data, msgSpec.parent)
+    }
+
+    //handle boolvars 8 by 8 (each boolvar is written in 1/8 byte)
+    if (msgSpec.boolVars.length > 0) {
         for (let j = 0; j < msgSpec.boolVars.length; j += 8) {
             let _box0: number = 0;
-            for (let i = 0; i < 8  && i < msgSpec.boolVars.length / (j+1); i++) {
+            for (let i = 0; i < 8 && i < msgSpec.boolVars.length / (j + 1); i++) {
                 _box0 = BooleanByteWrapper.setFlag(_box0, i, data[msgSpec?.boolVars[i].name]);
             }
 
@@ -165,18 +167,20 @@ export function serialize(dataWrapper: CustomDataWrapper = new CustomDataWrapper
         }
     }
 
-    msgSpec?.vars?.map(desc => {
+    msgSpec.vars.map(desc => {
         if (getPrimitives.includes(desc.type)) {
-            writeAtomicType(dataWrapper, desc, data[desc.name])
+            writeAtomicType(dataWrapper, data[desc.name], desc)
         }
         else {
             if (desc.length == null) {
-                serialize(dataWrapper, data[desc.name], getTypesFromName[desc.type].protocolId)
+                if(!data[desc.name])
+                    console.log(data,desc.name)
+                serialize(dataWrapper, data[desc.name], desc.type)
             }
             else {
                 dataWrapper.write(desc.length, data[desc.name].length)
                 for (let i = 0; i < data[desc.name].length; i++)
-                    serialize(dataWrapper, data[desc.name][i], getTypesFromName[desc.type].protocolId)
+                    serialize(dataWrapper, data[desc.name][i], desc.type)
             }
         }
     })

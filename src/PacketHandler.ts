@@ -5,6 +5,7 @@ import fs from "fs"
 
 import {MsgAction} from "./types"
 import CustomDataWrapper from "./utils/CustomDataWraper"
+import { ConsoleLoggerImpl } from "typescript-logging"
 
 export default class PacketHandler {
 
@@ -22,7 +23,12 @@ export default class PacketHandler {
     }
 
 
-
+    public reset(){
+        this.message=null;
+        this.offset = 0;
+        this.buffer= Buffer.alloc(0)
+        this.currentHeader =null;
+    }
 
     public processChunk = (data: Buffer): Buffer => {
         const headers: Header[] = []
@@ -41,13 +47,13 @@ export default class PacketHandler {
                 if (!this.currentHeader) {
                     break;
                 }
-
                 //check if this message is to alter
                 for (let i = 0; i < this.msgsActions.length; i++)
                     if (this.currentHeader.packetID === this.msgsActions[i].protocolId) {
                         this.message = this.msgsActions[i]
                         console.log("msg found")
                     }
+
                 //push header to list of header to log it
                 headers.push(this.currentHeader)
                 //remove raw header from buffer (2 is for hi-header)
@@ -56,21 +62,22 @@ export default class PacketHandler {
 
             // if buffer contains whole msg then
             if (this.buffer.length >= this.currentHeader.length) {
-                //remove message from data to append it altered later
+                //updata msg raw data
                 if (this.message) {
                     //raw message unmodified
-                    let rawMessage = data.slice(this.offset, this.offset + this.currentHeader.length + 2 + this.currentHeader.lenType)
+                    let rawMessage = this.buffer.slice(this.offset, this.offset + this.currentHeader.length + 2 + this.currentHeader.lenType)
 
-                    let msgContent = deserialize(new CustomDataWrapper(rawMessage),this.message.protocolId)
+                    let msgContent = deserialize(new CustomDataWrapper(rawMessage),this.currentHeader.name)
                     if(this.message.doInBackground != null)
                         this.message.doInBackground(msgContent)
 
                     if(this.message.alter != null)
-                        msgContent = this.message.alter(msgContent)
+                       this.message.alter(msgContent)
                     //raw message after modification
-                    rawMessage = serialize(new CustomDataWrapper(),msgContent,this.message.protocolId)
+                    rawMessage = serialize(new CustomDataWrapper(),msgContent,this.currentHeader.name)
 
                     const newHeader = new Header(this.currentHeader.packetID, rawMessage.length)
+                    
                     data = Buffer.concat([
                         data.slice(0, this.offset),
                         newHeader.toRaw(), rawMessage,
@@ -80,10 +87,7 @@ export default class PacketHandler {
                 }
                 else
                     this.offset += this.currentHeader.length + 2 + this.currentHeader.lenType
-                if (this.currentHeader.packetID === 5632) {
-                    let rawMessage = data.slice(this.offset, this.offset + this.currentHeader.length + 2 + this.currentHeader.lenType)
-                    fs.appendFile("log.txt", rawMessage.toString() + "\n", () => this.log.debug("append to fs logs"))
-                }
+                
                 // remove old msg content starting of the index of the next msg
                 this.buffer = this.buffer.slice(this.currentHeader.length)
                 //reset header to null
