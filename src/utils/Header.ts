@@ -1,10 +1,6 @@
 import { Socket } from "net"
-import {msg_from_id} from "./protocol.json"
+import {getMsgFromId} from "./Protocol"
 
-const getMsgFromId = msg_from_id as Anything
-interface Anything {
-    [key: string]: any;
-  }
 
 export default class Header {
     private _packetID: number;
@@ -46,7 +42,7 @@ export default class Header {
 
         let length = 0
         if (lenType > 0) {
-            length = data.readIntBE(offset + 2, lenType)
+            length = data.readUIntBE(offset + 2, lenType)
         }
 
         return new Header(packetID, length);

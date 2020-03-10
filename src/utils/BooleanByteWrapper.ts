@@ -1,7 +1,5 @@
-   export class BooleanByteWrapper
+   export default class BooleanByteWrapper
    {
-       
-      
       constructor()
       {
       }

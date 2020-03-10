@@ -1,4 +1,4 @@
-import {CustomDataWrapper} from './CustomDataWraper'
+import CustomDataWrapper from './CustomDataWraper'
 
 test('read and write short', () => {
     const dataWrapper = new CustomDataWrapper(Buffer.alloc(0));

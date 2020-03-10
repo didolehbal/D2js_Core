@@ -1,10 +1,6 @@
-import PROTOCOL from "./protocol.json"
+import {getMsgFromId} from "./utils/Protocol"
 import PacketHandler from "./PacketHandler"
 
-const msg_from_id = PROTOCOL.msg_from_id as Anything
-interface Anything {
-  [key: string]: any;
-}
 
 /*test("does work",()=>{
     const name =6100

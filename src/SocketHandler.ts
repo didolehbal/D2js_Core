@@ -1,22 +1,15 @@
 import { Socket } from "net";
-import Message from "../ankama/Message";
-import DofusSocket from "./DofusSocket"
-import SelectedServerDataExtendedMessage from "../ankama/SelectedServerDataExtendedMessage";
-import SelectedServerDataMessage from "../ankama/SelectedServerDataMessage";
 import PacketHandler from "./PacketHandler";
-import Header from "./Header";
-
+import { MsgAction } from "./types"
 export default class SocketHandler {
     private client: Socket;
     private server: Socket;
-    private _MessagesToHandle: Message[]
     private serverPacketHandler: PacketHandler;
     private clientPacketHandler: PacketHandler;
-    constructor(client: Socket, server: Socket, messagesToHandle: Message[]) {
+    constructor(client: Socket, server: Socket, serverMsgsActions: MsgAction[]) {
         this.client = client;
         this.server = server;
-        this._MessagesToHandle = messagesToHandle
-        this.serverPacketHandler = new PacketHandler([new SelectedServerDataExtendedMessage(),new SelectedServerDataMessage], "SERVER")
+        this.serverPacketHandler = new PacketHandler(serverMsgsActions, "SERVER")
         this.clientPacketHandler = new PacketHandler([], "CLIENT")
     }
 
@@ -39,12 +32,12 @@ export default class SocketHandler {
     public start = () => {
         const { server, client } = this;
         client.on("data", (data) => {
-            const processedData:Buffer = this.clientPacketHandler.processChunk(data)
+            const processedData: Buffer = this.clientPacketHandler.processChunk(data)
             this.sendToServer(processedData)
         })
 
         server.on("data", (data) => {
-            const processedData:Buffer = this.serverPacketHandler.processChunk(data)
+            const processedData: Buffer = this.serverPacketHandler.processChunk(data)
             this.sendToClient(processedData)
 
         })

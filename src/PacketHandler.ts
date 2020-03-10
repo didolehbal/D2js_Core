@@ -1,25 +1,24 @@
-import Message from "../ankama/Message";
-import Header from "./Header"
-import {factory} from "../utils/Logger"
-
+import Header from "./utils/Header"
+import { factory } from "./utils/Logger"
+import {deserialize, serialize} from "./utils/Protocol"
 import fs from "fs"
 
+import {MsgAction} from "./types"
+import CustomDataWrapper from "./utils/CustomDataWraper"
 
 export default class PacketHandler {
 
-    private message: Message | null = null;
+    private message: MsgAction | null = null;
     private offset: number = 0
     private buffer: Buffer = Buffer.alloc(0);
     private currentHeader: Header | null = null
-    private messagesToAlter: Message[];
-    private log:any
-    private name :string
+    private msgsActions: MsgAction[];
+    private log: any
 
-    constructor(messagesToAlter :Message[], name: string) {
-        this.messagesToAlter = messagesToAlter
-        this.name = name
+    constructor(msgsActions: MsgAction[], name: string) {
+        this.msgsActions = msgsActions
         this.log = factory.getLogger(name);
-        
+
     }
 
 
@@ -44,9 +43,9 @@ export default class PacketHandler {
                 }
 
                 //check if this message is to alter
-                for (let i = 0; i < this.messagesToAlter.length; i++)
-                    if (this.currentHeader.packetID === this.messagesToAlter[i].protocolId) {
-                        this.message = this.messagesToAlter[i]
+                for (let i = 0; i < this.msgsActions.length; i++)
+                    if (this.currentHeader.packetID === this.msgsActions[i].protocolId) {
+                        this.message = this.msgsActions[i]
                         console.log("msg found")
                     }
                 //push header to list of header to log it
@@ -62,10 +61,13 @@ export default class PacketHandler {
                     //raw message unmodified
                     let rawMessage = data.slice(this.offset, this.offset + this.currentHeader.length + 2 + this.currentHeader.lenType)
 
-                    this.message.unpack(rawMessage, this.currentHeader.lenType + 2)
-                    this.message.alterMsg()
+                    let msgContent = deserialize(new CustomDataWrapper(rawMessage),this.message.protocolId)
+                    if(this.message.alter != null)
+                        msgContent = this.message.alter(msgContent)
+                    if(this.message.doInBackground != null)
+                        this.message.doInBackground()
                     //raw message after modification
-                    rawMessage = this.message.pack()
+                    rawMessage = serialize(new CustomDataWrapper(),msgContent,this.message.protocolId)
 
                     const newHeader = new Header(this.currentHeader.packetID, rawMessage.length)
                     data = Buffer.concat([
@@ -77,9 +79,9 @@ export default class PacketHandler {
                 }
                 else
                     this.offset += this.currentHeader.length + 2 + this.currentHeader.lenType
-                if(this.currentHeader.packetID === 5632){
+                if (this.currentHeader.packetID === 5632) {
                     let rawMessage = data.slice(this.offset, this.offset + this.currentHeader.length + 2 + this.currentHeader.lenType)
-                    fs.appendFile("log.txt",rawMessage.toString() + "\n",()=> this.log("append to fs logs"))
+                    fs.appendFile("log.txt", rawMessage.toString() + "\n", () => this.log.debug("append to fs logs"))
                 }
                 // remove old msg content starting of the index of the next msg
                 this.buffer = this.buffer.slice(this.currentHeader.length)

@@ -1,5 +1,5 @@
 import Net, { Server, Socket } from "net";
-import SocketHandler from "./network/SocketHandler"
+import SocketHandler from "./SocketHandler"
 
 export default abstract class Proxy {
     protected _proxy: Server;

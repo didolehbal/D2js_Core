@@ -1,8 +1,10 @@
-const {Socket} = require("net")
+const fs = require("fs");
 
-let sock = new Socket()
-sock.connect({host:"63.34.214.78",port:5555},)
-
-sock.on("connect",()=>console.log("connected"))
-
-sock.on("error",err => console.log(err))
+fs.readFile("log.txt", (err, data) => {
+  if (err) {
+      console.log("error")
+  }
+  for(let b = data.slice(0, data.indexOf("\n")), rest = data.slice(data.indexOf("\n")); b.length > 0 ;b = rest.slice(0,rest.indexOf("\n")), rest = rest.slice(rest.indexOf("\n"))){
+      console.log(b)
+  }
+});

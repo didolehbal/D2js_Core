@@ -23,3 +23,13 @@ GameRolePlayShowActorMessage id 5632 length 82 ======
 2020-03-07 13:29:21,138 DEBUG [SERVER] ===== packet name SetCharacterRestrictionsMessage id 170 length 11 ======
 2020-03-07 13:29:21,142 DEBUG [SERVER] ===== packet name GameMapMovementMessage id 951 length 16 ======
 2020-03-07 13:29:21,902 DEBUG [SERVER] ===== packet name UpdateMapPlayersAgressableStatusMessage id 6454 length 10 ======
+
+2020-03-07 15:09:06,787 DEBUG [SERVER] ===== packet name GameContextRemoveElementMessage id 251 length 8 ======
+
+
+??
+2020-03-07 15:11:47,129 DEBUG [SERVER] ===== packet name StatedElementUpdatedMessage id 5709 length 8 ======
+2020-03-07 15:11:47,130 DEBUG [SERVER] ===== packet name InteractiveElementUpdatedMessage id 5708 length 20 ======
+
+
+GameRolePlayActorInformations ->GameRolePlayCharacterInformations(extends GameRolePlayHumanoidInformations) ->
