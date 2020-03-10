@@ -68,7 +68,6 @@ export function deserialize(data: CustomDataWrapper, protocolId: number, typeId:
         throw new Error("msgSpec missing ! protocolID:" + protocolId + " " + typeId)
     }
 
-    console.log("deserializing " + msgSpec.name + "\n")
 
     //handle parent
     if (msgSpec.parent != null) {
@@ -85,7 +84,7 @@ export function deserialize(data: CustomDataWrapper, protocolId: number, typeId:
     if (msgSpec.boolVars.length > 0) {
         for (let j = 0; j < msgSpec.boolVars.length; j += 8) {
             let _box0: number = data.readByte();
-            for (let i = 0; i < 8; i++) {
+            for (let i = 0; i < 8 && i < msgSpec.boolVars.length / (j+1); i++) {
                 let bool1 = msgSpec?.boolVars[i];
                 result = {
                     ...result,
@@ -119,7 +118,6 @@ export function deserialize(data: CustomDataWrapper, protocolId: number, typeId:
                     let type = v.type
                     if (type == "ID") {
                         let id = data.readUnsignedShort()
-                        console.log(id, v)
                         type = getTypeFromId[id].name
                     }
                     res.push(deserialize(data, 1, getTypesFromName[type].protocolId))
@@ -159,7 +157,7 @@ export function serialize(dataWrapper: CustomDataWrapper = new CustomDataWrapper
      if (msgSpec.boolVars.length > 0) {
         for (let j = 0; j < msgSpec.boolVars.length; j += 8) {
             let _box0: number = 0;
-            for (let i = 0; i < 8; i++) {
+            for (let i = 0; i < 8  && i < msgSpec.boolVars.length / (j+1); i++) {
                 _box0 = BooleanByteWrapper.setFlag(_box0, i, data[msgSpec?.boolVars[i].name]);
             }
 

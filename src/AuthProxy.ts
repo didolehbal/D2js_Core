@@ -32,7 +32,9 @@ export default class AuthProxy extends Proxy {
             data.address = "localhost";
             data.ports =[5555]
         },
-        doInBackground:null
+        doInBackground:function(data:any){
+            console.log(`redirected from ${data?.address} ${data?.ports} to localhost [5555]`)
+        }
     }
     const msgAction2 : MsgAction = {
         protocolId:42,
