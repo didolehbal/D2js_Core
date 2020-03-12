@@ -5,6 +5,7 @@ import BooleanByteWrapper from "./BooleanByteWrapper"
 interface Anything {
     [key: string]: Message;
 }
+
 type Message = {
     name: string,
     parent: string | null,
@@ -24,7 +25,6 @@ export const getMsgFromId = msg_from_id as unknown as Anything
 export const getTypesFromName = types as unknown as Anything
 export const getTypeFromId = types_from_id as unknown as Anything
 export const getPrimitives = primitives as string[]
-
 
 export function readAtomicType(data: CustomDataWrapper, desc: variable): {} {
     if (desc.optional) console.log("optional !!")
@@ -63,7 +63,6 @@ export function deserialize(data: CustomDataWrapper, typeName: string): {} {
         throw new Error("msgSpec missing ! typeName: " + typeName)
     }
 
-
     //handle parent
     if (msgSpec.parent != null) {
 
@@ -84,7 +83,6 @@ export function deserialize(data: CustomDataWrapper, typeName: string): {} {
             }
         }
     }
-
 
     //handle vars
     msgSpec.vars.map(v => {

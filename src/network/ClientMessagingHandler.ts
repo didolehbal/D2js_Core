@@ -42,7 +42,7 @@ export default class ClientMessagingHandler {
             // read new header if we're at the beggining of a new msg
             if (!this.currentHeader) {
                 //read header from buff
-                this.currentHeader = Header.HeaderFromBuffer(this.buffer)
+                this.currentHeader = Header.fromRaw(this.buffer)
                 //if insufficient data in buffer end
                 if (!this.currentHeader) {
                     break;

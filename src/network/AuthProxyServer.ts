@@ -1,10 +1,10 @@
-import Proxy from "./Proxy";
+import ProxyServer from "./ProxyServer";
 import {Socket} from "net"
 import Config from "../config.json"
-import SocketHandler from "./SocketHandler"
+import Proxy from "./Proxy"
 import {MsgAction } from "../types"
 
-export default class AuthProxy extends Proxy {
+export default class AuthProxyServer extends ProxyServer {
     constructor() {
         super(Config.authServerIps[1], Config.port)
     }
@@ -29,6 +29,7 @@ export default class AuthProxy extends Proxy {
         protocolId:6469,
         typeName:"SelectedServerDataMessage",
         alter:function(data:any) {
+            //TODO : start a game ProxyServer server based on data.adress if not already done
             data.address = "localhost";
             data.ports =[7778]
         },
@@ -47,7 +48,7 @@ export default class AuthProxy extends Proxy {
             console.log(`redirected from ${data?.address} ${data?.ports} to localhost [5555]`)
         }
     }
-    const socketHandler = new SocketHandler(dofusClient, dofusServer,[msgAction1,msgAction2]);
-    socketHandler.start()
+    const proxy = new Proxy(dofusClient, dofusServer,[msgAction1,msgAction2]);
+    proxy.start()
 }
 }

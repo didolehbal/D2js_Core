@@ -39,14 +39,14 @@ export default class ServerMessagingHandler {
             // read new header if we're at the beggining of a new msg
             if (!this.currentHeader) {
                 //read header from buff
-                this.currentHeader = Header.HeaderFromBuffer(this.buffer)
+                this.currentHeader = Header.fromRaw(this.buffer)
                 //if insufficient data in buffer end
                 if (!this.currentHeader) {
                     break;
                 }
                 //check if this message is to alter
                 for (let i = 0; i < this.msgsActions.length; i++)
-                    if (this.currentHeader.packetID === this.msgsActions[i].protocolId) {
+                    if (this.currentHeader.protocolID === this.msgsActions[i].protocolId) {
                         this.message = this.msgsActions[i]
                         break;
                     }
@@ -58,11 +58,11 @@ export default class ServerMessagingHandler {
             }
 
             // if buffer contains whole msg then
-            if (this.buffer.length >= this.currentHeader.length) {
+            if (this.buffer.length >= this.currentHeader.bodyLength) {
                 //update msg raw data
                 if (this.message) {
                     //raw message unmodified
-                    let rawMessage = this.buffer.slice(0, this.currentHeader.length/* + 2 + this.currentHeader.lenType*/)
+                    let rawMessage = this.buffer.slice(0, this.currentHeader.bodyLength/* + 2 + this.currentHeader.lenType*/)
 
                     let msgContent = deserialize(new CustomDataWrapper(rawMessage),this.currentHeader.name)
                     if(this.message.doInBackground != null)
@@ -73,20 +73,20 @@ export default class ServerMessagingHandler {
                     //raw message after modification
                     rawMessage = serialize(new CustomDataWrapper(),msgContent,this.currentHeader.name)
 
-                    const newHeader = new Header(this.currentHeader.packetID, rawMessage.length)
+                    const newHeader = new Header(this.currentHeader.protocolID, rawMessage.length)
                     
                     data = Buffer.concat([
                         data.slice(0, this.offset),
                         newHeader.toRaw(), rawMessage,
-                        data.slice(this.offset + this.currentHeader.length + 2 + this.currentHeader.lenType)])
+                        data.slice(this.offset + this.currentHeader.bodyLength + 2 + this.currentHeader.lenType)])
 
                     this.message = null
                 }
                 //else //??
-                this.offset += this.currentHeader.length + 2 + this.currentHeader.lenType
+                this.offset += this.currentHeader.bodyLength + 2 + this.currentHeader.lenType
                 
                 // remove old msg content starting of the index of the next msg
-                this.buffer = this.buffer.slice(this.currentHeader.length)
+                this.buffer = this.buffer.slice(this.currentHeader.bodyLength)
                 //reset header to null
                 this.currentHeader = null;
 

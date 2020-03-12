@@ -1,8 +1,8 @@
-import Proxy from "./Proxy";
+import ProxyServer from "./ProxyServer";
 import {Socket} from "net"
-import SocketHandler from "./SocketHandler"
+import Proxy from "./Proxy"
 
-export default class GameProxy extends Proxy {
+export default class GameProxyServer extends ProxyServer {
     constructor(remoteAdress:string,localPort:number) {
         super(remoteAdress, localPort)
     }
@@ -23,7 +23,7 @@ export default class GameProxy extends Proxy {
         }
         dofusServer.on("connect",()=>console.log("connected to dofus Game server !"))
     
-        const socketHandler = new SocketHandler(dofusClient, dofusServer,[]);
-        socketHandler.start()
+        const proxy = new Proxy(dofusClient, dofusServer,[]);
+        proxy.start()
     }
 }

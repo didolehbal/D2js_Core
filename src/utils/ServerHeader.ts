@@ -29,9 +29,6 @@ export default class ServerHeader extends Header {
         return dw.getBuffer();
     }
 
-
-
-
     public static fromRaw = (data: Buffer): Header | null => {
 
         if (data.length < 2)
@@ -49,7 +46,6 @@ export default class ServerHeader extends Header {
 
         if (data.length < 2 + lenType)
             return null
-
 
         let bodyLength = 0
         if (lenType > 0) {
