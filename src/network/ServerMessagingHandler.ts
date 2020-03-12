@@ -1,13 +1,10 @@
-import Header from "../utils/Header"
+import Header from "../utils/ServerHeader"
 import { factory } from "../utils/Logger"
 import {deserialize, serialize} from "../utils/Protocol"
-import fs from "fs"
-
 import {MsgAction} from "../types"
 import CustomDataWrapper from "../utils/CustomDataWraper"
-import { ConsoleLoggerImpl } from "typescript-logging"
 
-export default class PacketHandler {
+export default class ServerMessagingHandler {
 
     private message: MsgAction | null = null;
     private offset: number = 0
@@ -16,9 +13,9 @@ export default class PacketHandler {
     private msgsActions: MsgAction[];
     private log: any
 
-    constructor(msgsActions: MsgAction[], name: string) {
+    constructor(msgsActions: MsgAction[]) {
         this.msgsActions = msgsActions
-        this.log = factory.getLogger(name);
+        this.log = factory.getLogger("SERVER");
 
     }
 
@@ -51,7 +48,6 @@ export default class PacketHandler {
                 for (let i = 0; i < this.msgsActions.length; i++)
                     if (this.currentHeader.packetID === this.msgsActions[i].protocolId) {
                         this.message = this.msgsActions[i]
-                        console.log("msg found")
                         break;
                     }
 
@@ -66,7 +62,7 @@ export default class PacketHandler {
                 //update msg raw data
                 if (this.message) {
                     //raw message unmodified
-                    let rawMessage = this.buffer.slice(0, this.currentHeader.length + 2 + this.currentHeader.lenType)
+                    let rawMessage = this.buffer.slice(0, this.currentHeader.length/* + 2 + this.currentHeader.lenType*/)
 
                     let msgContent = deserialize(new CustomDataWrapper(rawMessage),this.currentHeader.name)
                     if(this.message.doInBackground != null)
@@ -103,10 +99,5 @@ export default class PacketHandler {
 
         return data
     }
-}
-
-interface ExtractPacket {
-    rawPacket: Buffer,
-    header: Header
-    offset: number
+    
 }

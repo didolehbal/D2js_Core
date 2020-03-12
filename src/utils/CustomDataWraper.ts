@@ -157,7 +157,6 @@ export default class CustomDataWrapper {
       throw new Error("Too much data");
 
    }
-
    public readVarUhShort(): number {
       return this.readVarShort();
    }

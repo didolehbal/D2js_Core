@@ -1,6 +1,6 @@
 import { deserialize, serialize, readAtomicType, writeAtomicType } from "./Protocol"
 import CustomDataWrapper from "./CustomDataWraper"
-import Header from "./Header"
+import Header from "./ServerHeader"
 
 
 test("deserialize", () => {

@@ -1,16 +1,17 @@
 import { Socket } from "net";
-import PacketHandler from "./PacketHandler";
+import ServerMessagingHandler from "./ServerMessagingHandler";
+import ClientMessagingHandler from "./ClientMessagingHandler"
 import { MsgAction } from "../types"
 export default class SocketHandler {
     private client: Socket;
     private server: Socket;
-    private serverPacketHandler: PacketHandler;
-    private clientPacketHandler: PacketHandler;
+    private serverMessagingHandler: ServerMessagingHandler;
+    private clientMessagingHandler: ClientMessagingHandler;
     constructor(client: Socket, server: Socket, serverMsgsActions: MsgAction[]) {
         this.client = client;
         this.server = server;
-        this.serverPacketHandler = new PacketHandler(serverMsgsActions, "SERVER")
-        this.clientPacketHandler = new PacketHandler([], "CLIENT")
+        this.serverMessagingHandler = new ServerMessagingHandler(serverMsgsActions)
+        this.clientMessagingHandler = new ClientMessagingHandler([])
     }
 
     public sendToClient = (data: Buffer) => {
@@ -33,23 +34,23 @@ export default class SocketHandler {
         const { server, client } = this;
         client.on("data", (data) => {
             try{
-            const processedData: Buffer = this.clientPacketHandler.processChunk(data)
+            const processedData: Buffer = this.clientMessagingHandler.processChunk(data)
             this.sendToServer(processedData)
             }catch(ex){
                 console.trace(ex)
                 this.sendToServer(data)
-                this.clientPacketHandler.reset()
+                this.clientMessagingHandler.reset()
             }
         })
 
         server.on("data", (data) => {
             try {
-                const processedData: Buffer = this.serverPacketHandler.processChunk(data)
+                const processedData: Buffer = this.serverMessagingHandler.processChunk(data)
                 this.sendToClient(processedData)
             } catch (ex) {
                 console.trace(ex)
                 this.sendToClient(data)
-                this.serverPacketHandler.reset()
+                this.serverMessagingHandler.reset()
             }
         })
 
