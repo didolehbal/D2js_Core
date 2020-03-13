@@ -1,14 +1,27 @@
 import AuthProxyServer from "./network/AuthProxyServer"
 import GameProxyServer from "./network/GameProxyServer"
-import {hook} from "./hook/hookers"
+import { hook } from "./hook/hookers"
+import { MsgAction } from "./types"
+import Proxy from "./network/Proxy"
 
-export function start(){
-    const authProxy = new AuthProxyServer()
-    authProxy.start()
-    
-    const gameProxy = new GameProxyServer("thanatena.ankama-games.com", 7778)
+export const gameProxies: Proxy[] = new Array<Proxy>()
+
+export function startGameServer(address: string = "thanatena.ankama-games.com", port: number = 7778) {
+    const gameProxy = new GameProxyServer(address, port, gameProxies)
     gameProxy.start()
 }
-export function spawnClient(){
-    hook()
+export function spawnClient() {
+    return hook()
 }
+
+
+export function startAuthServer() {
+    const authProxy = new AuthProxyServer()
+    authProxy.start()
+}
+
+export type Action = MsgAction;
+
+startAuthServer()
+startGameServer()
+spawnClient()

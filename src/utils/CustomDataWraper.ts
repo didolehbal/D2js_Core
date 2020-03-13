@@ -38,13 +38,13 @@ export default class CustomDataWrapper {
    public read(type: string) {
       switch (type) {
          case "UnsignedByte":
-         return this.readUnsignedByte()
+            return this.readUnsignedByte()
          case "UnsignedShort":
             return this.readUnsignedShort()
          case "Short":
             return this.readShort()
          case "VarLong":
-            //return this.readVarLong()
+            return this.readVarLong()
          case "VarUhInt":
          case "VarInt":
             return this.readVarInt()
@@ -74,7 +74,7 @@ export default class CustomDataWrapper {
          case "Short":
             return this.writeShort(value)
          case "VarLong":
-         //   return this.writeVarLong(value)
+            return this.writeVarLong(value)
          case "VarUhInt":
          case "VarInt":
             return this.writeVarInt(value)
@@ -90,7 +90,7 @@ export default class CustomDataWrapper {
             return this.writeByte(value)
          case "Double":
             return this.writeDouble(value)
-         
+
          default:
             throw new Error(`${type} not implemented`)
       }
@@ -277,25 +277,22 @@ export default class CustomDataWrapper {
       let res = this.readInt64();
       return res;
    }
-   public readUnsignedByte(){
-      let b = this._data.readUIntBE(this.position,1)
+   public readUnsignedByte(): number {
+      let b = this._data.readUIntBE(this.position, 1)
       this.position++
       return b
    }
-   private readInt64() : number
-   {
-      var b:number = 0;
-      var result ={low :0, high : 0}
-      var i:number = 0;
-      while(true)
-      {
+   private readInt64(): number {
+      var b: number = 0;
+      var result = { low: 0, high: 0 }
+      var i: number = 0;
+      while (true) {
          b = this.readUnsignedByte();
-         if(i == 28)
-         {
+         console.log(b)
+         if (i == 28) {
             break;
          }
-         if(b >= 128)
-         {
+         if (b >= 128) {
             result.low = result.low | (b & 127) << i;
             i = i + 7;
             continue;
@@ -305,68 +302,72 @@ export default class CustomDataWrapper {
 
          return result.low + result.high;
       }
-      if(b >= 128)
-      {
+      if (b >= 128) {
          b = b & 127;
          result.low = result.low | b << i;
          result.high = b >>> 4;
          i = 3;
-         while(true)
-         {
+         while (true) {
             b = this.readUnsignedByte();
-            if(i < 32)
-            {
-               if(b >= 128)
-               {
+            if (i < 32) {
+               if (b >= 128) {
                   result.high = result.high | (b & 127) << i;
                }
-               else
-               {
+               else {
                   break;
                }
             }
             i = i + 7;
          }
          result.high = result.high | b << i;
-      console.log(result)
-
          return result.low + result.high;
       }
       result.low = result.low | b << i;
       result.high = b >>> 4;
-      console.log(result)
       return result.low + result.high;
    }
-   
-   public writeVarLong(value:number) : void
-   {
-      var i:number = 0;
-      var val={low:0,high:0}
-         val.low = value & Number.parseInt("0000FFFF",16)
-         val.high = value & Number.parseInt("FFFF0000",16)
-         console.log(value,val, val.high+ val.low)
-      if(val.high == 0)
-      {
+
+   public writeVarLong(value: number): void {
+      //TODO: varlong not working
+      var i: number = 0;
+      var val = { low: 0, high: 0 }
+      val.low = value & Number.parseInt("0000FFFF", 16)
+      val.high = value & Number.parseInt("FFFF0000", 16)
+
+
+      if (val.high == 0) {
+         console.log(val.low)
          this.writeInt(val.low);
       }
-      else
-      {
-         for(i = 0; i < 4; )
-         {
+      else {
+         for (i = 0; i < 4;) {
             this.writeByte(val.low & 127 | 128);
             val.low = val.low >>> 7;
             i++;
          }
-         if((val.high & 268435455 << 3) == 0)
-         {
+         if ((val.high & 268435455 << 3) == 0) {
             this.writeByte(val.high << 4 | val.low);
          }
-         else
-         {
+         else {
             this.writeByte((val.high << 4 | val.low) & 127 | 128);
             this.writeInt(val.high >>> 3);
          }
       }
+   }
+   public readUnsignedInt(): number {
+      let b = this._data.readUInt32BE(this.position)
+      this.position += 4
+      return b
+   }
+   public readFloat(): number {
+      let b = this._data.readFloatBE(this.position);
+      this.position += 4
+      return b
+   }
+   public writeUnsignedInt(value: number) {
+      let buff = Buffer.alloc(4)
+      buff.writeUInt32BE(value, 0)
+      this._data = Buffer.concat([this._data, buff])
    }
    /* 
    
@@ -387,26 +388,10 @@ export default class CustomDataWrapper {
  
    
    
+ 
    
-   public readUnsignedByte() : number
-   {
-      return this._data.readUnsignedByte();
-   }
-   
-   public readShort() : number
-   {
-      return this._data.readShort();
-   }
-   
-   public readUnsignedShort() : number
-   {
-      return this._data.readUnsignedShort();
-   }
-   
-   public readInt() : number
-   {
-      return this._data.readInt();
-   }
+ 
+  
    
    public readUnsignedInt() : number
    {

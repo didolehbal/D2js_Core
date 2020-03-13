@@ -3,6 +3,7 @@ import { factory } from "../utils/Logger"
 import {deserialize, serialize} from "../utils/Protocol"
 import {MsgAction} from "../types"
 import CustomDataWrapper from "../utils/CustomDataWraper"
+import {getTypesFromName} from "../utils/Protocol"
 
 export default class ServerMessagingHandler {
 
@@ -10,7 +11,7 @@ export default class ServerMessagingHandler {
     private offset: number = 0
     private buffer: Buffer = Buffer.alloc(0);
     private currentHeader: Header | null = null
-    private msgsActions: MsgAction[];
+    public msgsActions: MsgAction[];
     private log: any
 
     constructor(msgsActions: MsgAction[]) {
@@ -44,6 +45,7 @@ export default class ServerMessagingHandler {
                 if (!this.currentHeader) {
                     break;
                 }
+                this.log.debug(this.currentHeader.toString())
                 //check if this message is to alter
                 for (let i = 0; i < this.msgsActions.length; i++)
                     if (this.currentHeader.protocolID === this.msgsActions[i].protocolId) {
@@ -95,7 +97,7 @@ export default class ServerMessagingHandler {
 
 
         //log the headers
-        headers.map(h => this.log.debug(h.toString()))
+       // headers.map(h => this.log.debug(h.toString()))
 
         return data
     }

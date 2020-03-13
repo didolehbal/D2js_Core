@@ -3,7 +3,7 @@ import ServerMessagingHandler from "./ServerMessagingHandler";
 import ClientMessagingHandler from "./ClientMessagingHandler"
 import { MsgAction } from "../types"
 
-export default class SocketHandler {
+export default class Proxy {
     private client: Socket;
     private server: Socket;
     private serverMessagingHandler: ServerMessagingHandler;
@@ -31,6 +31,9 @@ export default class SocketHandler {
         }
     }
 
+    public actionToServer(action:MsgAction){
+        this.serverMessagingHandler.msgsActions.push(action)
+    }
     public start = () => {
         const { server, client } = this;
         client.on("data", (data) => {

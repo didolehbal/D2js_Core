@@ -9,6 +9,8 @@ test("deserialize", () => {
   //let raw = Buffer.from("580151002441e013e01de00000003c01bf04e1010000000000018201000000054178696f6d009d00080000000101999c030006477261696e6501ab01000994060800098f1d07c1ae5100000041e013e024a00000", "hex")
   //let raw = Buffer.from("64d90a0001ef81b0a60d000115", "hex")
   const header = Header.fromRaw(raw)
+  if(!header)
+  return
 //3570139375
   let rawBody = raw.slice(header.lenType + 2)
   //expect(rawBody.length).toBeGreaterThanOrEqual(header.length)
@@ -68,14 +70,14 @@ test("read write AtomicVar", () => {
       desc: { type: "Byte", name: "test", length: "UnsignedShort", optional: false },
       value: [77,111,50]
     },
-  /*  {
+    {
       desc: { type: "VarLong", name: "test", length: "", optional: false },
-      value: 12548
+      value: 12548000
     },
     {
       desc: { type: "VarLong", name: "test", length: "UnsignedShort", optional: false },
       value: [124448,12544,1866]
-    },*/
+    },
   ]
 
   for (let i = 0; i < vars.length; i++) {

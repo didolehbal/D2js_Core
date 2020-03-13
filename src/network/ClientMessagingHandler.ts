@@ -3,6 +3,7 @@ import { factory } from "../utils/Logger"
 import { deserialize, serialize } from "../utils/Protocol"
 import { MsgAction } from "../types"
 import CustomDataWrapper from "../utils/CustomDataWraper"
+import { getTypesFromName } from "../utils/Protocol"
 
 export default class ClientMessagingHandler {
 
@@ -10,7 +11,7 @@ export default class ClientMessagingHandler {
     private offset: number = 0
     private buffer: Buffer = Buffer.alloc(0);
     private currentHeader: Header | null = null
-    private msgsActions: MsgAction[];
+    public msgsActions: MsgAction[];
     private log: any
 
     private lastInstanceID: number = 0
@@ -47,6 +48,7 @@ export default class ClientMessagingHandler {
                 if (!this.currentHeader) {
                     break;
                 }
+                this.log.debug(this.currentHeader.toString())
                 //check if this message is to alter
                 for (let i = 0; i < this.msgsActions.length; i++)
                     if (this.currentHeader.protocolID === this.msgsActions[i].protocolId) {
@@ -80,17 +82,15 @@ export default class ClientMessagingHandler {
                     rawMessage = serialize(new CustomDataWrapper(), msgContent, this.currentHeader.name)
                     this.message = null
 
+                    const newHeader = new Header(this.currentHeader.protocolID,
+                        rawMessage.length,
+                        this.currentHeader.instanceID + this.offsetInstanceID)
+
+                    data = Buffer.concat([
+                        data.slice(0, this.offset),
+                        newHeader.toRaw(), rawMessage,
+                        data.slice(this.offset + this.currentHeader.bodyLength + this.currentHeader.headerLength)])
                 }
-
-                const newHeader = new Header(this.currentHeader.protocolID,
-                    rawMessage.length,
-                    this.currentHeader.instanceID + this.offsetInstanceID)
-
-                data = Buffer.concat([
-                    data.slice(0, this.offset),
-                    newHeader.toRaw(), rawMessage,
-                    data.slice(this.offset + this.currentHeader.bodyLength + this.currentHeader.headerLength)])
-
 
                 this.offset += this.currentHeader.bodyLength + this.currentHeader.headerLength
 
@@ -104,7 +104,7 @@ export default class ClientMessagingHandler {
 
 
         //log the headers
-        headers.map(h => this.log.debug(h.toString()))
+        // headers.map(h => this.log.debug(h.toString()))
 
         return data
     }

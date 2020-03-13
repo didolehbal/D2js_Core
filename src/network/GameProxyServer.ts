@@ -3,8 +3,10 @@ import {Socket} from "net"
 import Proxy from "./Proxy"
 
 export default class GameProxyServer extends ProxyServer {
-    constructor(remoteAdress:string,localPort:number) {
+    private gameProxies :Proxy[] 
+    constructor(remoteAdress:string,localPort:number,gameProxies :Proxy[] ) {
         super(remoteAdress, localPort)
+        this.gameProxies = gameProxies
     }
 
     protected handleConnection = (dofusClient:Socket) => {
@@ -25,5 +27,7 @@ export default class GameProxyServer extends ProxyServer {
     
         const proxy = new Proxy(dofusClient, dofusServer,[]);
         proxy.start()
+        
+        this.gameProxies.push(proxy)
     }
 }

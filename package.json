@@ -17,6 +17,7 @@
     "bytearray-node": "^3.1.7",
     "frida": "^12.8.14",
     "jest": "^25.1.0",
+    "redux": "^4.0.5",
     "ts-jest": "^25.2.1",
     "typescript-logging": "^0.6.4"
   }

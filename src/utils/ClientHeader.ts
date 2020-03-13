@@ -57,7 +57,7 @@ export default class ClientHeader extends Header {
         if (lenType > 0) {
             bodyLength = data.readUIntBE(6, lenType)
         }
-
+        Header.incrementGID()
         return new ClientHeader(protocolID, bodyLength, instanceID);
     }
 

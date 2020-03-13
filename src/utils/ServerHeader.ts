@@ -51,7 +51,7 @@ export default class ServerHeader extends Header {
         if (lenType > 0) {
             bodyLength = data.readUIntBE(2, lenType)
         }
-
+        Header.incrementGID()
         return new ServerHeader(protocolID, bodyLength);
     }
 

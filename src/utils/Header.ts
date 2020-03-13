@@ -53,6 +53,9 @@ export default abstract class Header  {
 
     public abstract toRaw(): Buffer
 
+    static incrementGID(){
+        Header.GLOBAL_INSTANCE_ID += 1
+    }
     private lenTypeFromBodyLength(bodyLength: number): number {
         if (bodyLength > 65535) {
             return 3;
