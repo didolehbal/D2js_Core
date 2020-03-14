@@ -2,17 +2,29 @@ import { Socket } from "net";
 import ServerMessagingHandler from "./ServerMessagingHandler";
 import ClientMessagingHandler from "./ClientMessagingHandler"
 import { MsgAction } from "../types"
+import { store } from "../redux/store"
 
 export default class Proxy {
     private client: Socket;
     private server: Socket;
     private serverMessagingHandler: ServerMessagingHandler;
     private clientMessagingHandler: ClientMessagingHandler;
+    private store: any;
     constructor(client: Socket, server: Socket, serverMsgsActions: MsgAction[]) {
         this.client = client;
         this.server = server;
         this.serverMessagingHandler = new ServerMessagingHandler(serverMsgsActions)
         this.clientMessagingHandler = new ClientMessagingHandler([])
+        this.store = store;
+        let msg: MsgAction = {
+            typeName: "MapComplementaryInformationsDataMessage",
+            protocolId:226,
+            alter: null,
+            doInBackground: (data: any) => {
+                this.store.dispatch({ type: "MapComplementaryInformationsDataMessage", payload: data })
+            }
+        }
+        this.serverMessagingHandler.msgsActions.push(msg)
     }
 
     public sendToClient = (data: Buffer) => {
@@ -31,16 +43,16 @@ export default class Proxy {
         }
     }
 
-    public actionToServer(action:MsgAction){
+    public actionToServer(action: MsgAction) {
         this.serverMessagingHandler.msgsActions.push(action)
     }
     public start = () => {
         const { server, client } = this;
         client.on("data", (data) => {
-            try{
-            const processedData: Buffer = this.clientMessagingHandler.processChunk(data)
-            this.sendToServer(processedData)
-            }catch(ex){
+            try {
+                const processedData: Buffer = this.clientMessagingHandler.processChunk(data)
+                this.sendToServer(processedData)
+            } catch (ex) {
                 console.trace(ex)
                 this.sendToServer(data)
                 this.clientMessagingHandler.reset()
@@ -64,7 +76,7 @@ export default class Proxy {
         });
 
         client.on('close', function (had_error) {
-            console.log("Client Disconnected",{error:had_error})
+            console.log("Client Disconnected", { error: had_error })
             server.end();
         });
         server.on('drain', function () {
@@ -72,7 +84,7 @@ export default class Proxy {
         });
 
         server.on('close', function (had_error: any) {
-            console.log("Server Disconnected",{error:had_error})
+            console.log("Server Disconnected", { error: had_error })
             client.end();
         });
     }

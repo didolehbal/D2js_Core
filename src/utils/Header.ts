@@ -70,7 +70,7 @@ export default abstract class Header  {
     }
 
     public toString(): string {
-        return `===== packet name ${this._name} id ${this.protocolID} instanceID ${this.instanceID} GB${Header.GLOBAL_INSTANCE_ID} bodyLength ${this.bodyLength} ======`
+        return `packet name ${this._name} id ${this.protocolID} instanceID ${this.instanceID} GB ${Header.GLOBAL_INSTANCE_ID} bodyLength ${this.bodyLength}`
     }
 
 }

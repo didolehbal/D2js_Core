@@ -4,6 +4,7 @@ import { hook } from "./hook/hookers"
 import { MsgAction } from "./types"
 import Proxy from "./network/Proxy"
 
+
 export const gameProxies: Proxy[] = new Array<Proxy>()
 
 export function startGameServer(address: string = "thanatena.ankama-games.com", port: number = 7778) {

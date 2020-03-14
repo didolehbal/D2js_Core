@@ -129,10 +129,6 @@ export default class CustomDataWrapper {
    }
 
    public readVarShort(): number {
-      /* let res = this.readVarInt();
-       if (res > CustomDataWrapper.SHORT_MAX_VALUE || res < CustomDataWrapper.SHORT_MIN_VALUE)
-          throw Error("short EXCEEDED")
-       return res*/
       var b: number = 0;
       var value: number = 0;
       var offset: number = 0;
@@ -155,16 +151,18 @@ export default class CustomDataWrapper {
          }
       }
       throw new Error("Too much data");
-
    }
+
    public readVarUhShort(): number {
       return this.readVarShort();
    }
+
    public readByte(): number {
       let b = this._data.readIntBE(this.position, 1);
       this.position++;
       return b
    }
+
    public readDouble(): number {
       let b = this._data.readDoubleBE(this.position);
       this.position += 8;
@@ -194,6 +192,7 @@ export default class CustomDataWrapper {
       this.position += 4
       return b;
    }
+
    public readBoolean(): boolean {
       return this.readByte() != 0;
    }
@@ -204,6 +203,7 @@ export default class CustomDataWrapper {
       buff.writeUIntBE(value & 255, 0, 1)
       this._data = Buffer.concat([this._data, buff])
    }
+
    public writeBytes(value: Buffer): void {
       this._data = Buffer.concat([this._data, value])
 
@@ -225,6 +225,7 @@ export default class CustomDataWrapper {
          this.writeByte(b)
       }
    }
+
    public writeVarShort(value: number): void {
       if (value > CustomDataWrapper.SHORT_MAX_VALUE || value < CustomDataWrapper.SHORT_MIN_VALUE) {
          throw new Error("Forbidden value");
@@ -263,32 +264,43 @@ export default class CustomDataWrapper {
       buff.writeInt32BE(value, 0)
       this._data = Buffer.concat([this._data, buff])
    }
+   public writeInt32(value: number): void {
+      while(value >= 128)
+      {
+            this.writeByte(value & 127 | 128);
+            value = value >>> 7;
+      }
+      this.writeByte(value);
+   }
    public writeBoolean(value: boolean): void {
       let buff = Buffer.alloc(1)
       buff.writeIntBE(value ? 1 : 0, 0, 1)
       this._data = Buffer.concat([this._data, buff])
    }
+
    public writeDouble(value: number): void {
       let buff = Buffer.alloc(8)
       buff.writeDoubleBE(value, 0)
       this._data = Buffer.concat([this._data, buff])
    }
+
    public readVarLong(): number {
       let res = this.readInt64();
       return res;
    }
+
    public readUnsignedByte(): number {
       let b = this._data.readUIntBE(this.position, 1)
       this.position++
       return b
    }
+
    private readInt64(): number {
       var b: number = 0;
       var result = { low: 0, high: 0 }
       var i: number = 0;
       while (true) {
          b = this.readUnsignedByte();
-         console.log(b)
          if (i == 28) {
             break;
          }
@@ -298,8 +310,6 @@ export default class CustomDataWrapper {
             continue;
          }
          result.low = result.low | b << i;
-         console.log(result)
-
          return result.low + result.high;
       }
       if (b >= 128) {
@@ -336,8 +346,7 @@ export default class CustomDataWrapper {
 
 
       if (val.high == 0) {
-         console.log(val.low)
-         this.writeInt(val.low);
+         this.writeInt32(val.low);
       }
       else {
          for (i = 0; i < 4;) {
@@ -350,20 +359,23 @@ export default class CustomDataWrapper {
          }
          else {
             this.writeByte((val.high << 4 | val.low) & 127 | 128);
-            this.writeInt(val.high >>> 3);
+            this.writeInt32(val.high >>> 3);
          }
       }
    }
+
    public readUnsignedInt(): number {
       let b = this._data.readUInt32BE(this.position)
       this.position += 4
       return b
    }
+
    public readFloat(): number {
       let b = this._data.readFloatBE(this.position);
       this.position += 4
       return b
    }
+
    public writeUnsignedInt(value: number) {
       let buff = Buffer.alloc(4)
       buff.writeUInt32BE(value, 0)

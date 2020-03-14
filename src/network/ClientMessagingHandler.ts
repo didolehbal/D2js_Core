@@ -76,10 +76,10 @@ export default class ClientMessagingHandler {
                     if (this.message.doInBackground != null)
                         this.message.doInBackground(msgContent)
 
-                    if (this.message.alter != null)
+                    if (this.message.alter != null) {
                         this.message.alter(msgContent)
-                    //raw message after modification
-                    rawMessage = serialize(new CustomDataWrapper(), msgContent, this.currentHeader.name)
+                        rawMessage = serialize(new CustomDataWrapper(), msgContent, this.currentHeader.name)
+                    }
                     this.message = null
 
                     const newHeader = new Header(this.currentHeader.protocolID,

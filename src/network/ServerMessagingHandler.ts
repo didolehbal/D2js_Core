@@ -1,9 +1,9 @@
 import Header from "../utils/ServerHeader"
 import { factory } from "../utils/Logger"
-import {deserialize, serialize} from "../utils/Protocol"
-import {MsgAction} from "../types"
+import { deserialize, serialize } from "../utils/Protocol"
+import { MsgAction } from "../types"
 import CustomDataWrapper from "../utils/CustomDataWraper"
-import {getTypesFromName} from "../utils/Protocol"
+import { getTypesFromName } from "../utils/Protocol"
 
 export default class ServerMessagingHandler {
 
@@ -21,11 +21,11 @@ export default class ServerMessagingHandler {
     }
 
 
-    public reset(){
-        this.message=null;
+    public reset() {
+        this.message = null;
         this.offset = 0;
-        this.buffer= Buffer.alloc(0)
-        this.currentHeader =null;
+        this.buffer = Buffer.alloc(0)
+        this.currentHeader = null;
     }
 
     public processChunk = (data: Buffer): Buffer => {
@@ -66,27 +66,26 @@ export default class ServerMessagingHandler {
                     //raw message unmodified
                     let rawMessage = this.buffer.slice(0, this.currentHeader.bodyLength/* + 2 + this.currentHeader.lenType*/)
 
-                    let msgContent = deserialize(new CustomDataWrapper(rawMessage),this.currentHeader.name)
-                    if(this.message.doInBackground != null)
+                    let msgContent = deserialize(new CustomDataWrapper(rawMessage), this.currentHeader.name)
+                    if (this.message.doInBackground != null)
                         this.message.doInBackground(msgContent)
 
-                    if(this.message.alter != null)
-                       this.message.alter(msgContent)
-                    //raw message after modification
-                    rawMessage = serialize(new CustomDataWrapper(),msgContent,this.currentHeader.name)
+                    if (this.message.alter != null) {
+                        this.message.alter(msgContent)
+                        rawMessage = serialize(new CustomDataWrapper(), msgContent, this.currentHeader.name)
+                        const newHeader = new Header(this.currentHeader.protocolID, rawMessage.length)
 
-                    const newHeader = new Header(this.currentHeader.protocolID, rawMessage.length)
-                    
-                    data = Buffer.concat([
-                        data.slice(0, this.offset),
-                        newHeader.toRaw(), rawMessage,
-                        data.slice(this.offset + this.currentHeader.bodyLength + 2 + this.currentHeader.lenType)])
+                        data = Buffer.concat([
+                            data.slice(0, this.offset),
+                            newHeader.toRaw(), rawMessage,
+                            data.slice(this.offset + this.currentHeader.bodyLength + 2 + this.currentHeader.lenType)])
+                    }
 
                     this.message = null
                 }
                 //else //??
                 this.offset += this.currentHeader.bodyLength + 2 + this.currentHeader.lenType
-                
+
                 // remove old msg content starting of the index of the next msg
                 this.buffer = this.buffer.slice(this.currentHeader.bodyLength)
                 //reset header to null
@@ -97,9 +96,9 @@ export default class ServerMessagingHandler {
 
 
         //log the headers
-       // headers.map(h => this.log.debug(h.toString()))
+        // headers.map(h => this.log.debug(h.toString()))
 
         return data
     }
-    
+
 }

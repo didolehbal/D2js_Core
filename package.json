@@ -9,7 +9,9 @@
   },
   "devDependencies": {
     "@types/node": "^13.7.4",
+    "@types/remote-redux-devtools": "^0.5.4",
     "nodemon": "^2.0.2",
+    "remote-redux-devtools": "^0.5.16",
     "typescript": "^3.8.2"
   },
   "dependencies": {
