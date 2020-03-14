@@ -1,6 +1,6 @@
 import { deserialize, serialize, readAtomicType, writeAtomicType } from "./Protocol"
 import CustomDataWrapper from "./CustomDataWraper"
-import Header from "./ServerHeader"
+import Header from "./Header"
 
 
 test("deserialize", () => {
@@ -8,7 +8,7 @@ test("deserialize", () => {
 
   //let raw = Buffer.from("580151002441e013e01de00000003c01bf04e1010000000000018201000000054178696f6d009d00080000000101999c030006477261696e6501ab01000994060800098f1d07c1ae5100000041e013e024a00000", "hex")
   //let raw = Buffer.from("64d90a0001ef81b0a60d000115", "hex")
-  const header = Header.fromRaw(raw)
+  const header = Header.fromRaw(raw,false)
   if(!header)
   return
 //3570139375
