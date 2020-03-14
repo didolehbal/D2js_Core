@@ -1,20 +1,19 @@
 import { Socket } from "net";
-import ServerMessagingHandler from "./ServerMessagingHandler";
-import ClientMessagingHandler from "./ClientMessagingHandler"
+import MessagingHandler from "./MessagingHandler";
 import { MsgAction } from "../types"
 import { store } from "../redux/store"
 
 export default class Proxy {
     private client: Socket;
     private server: Socket;
-    private serverMessagingHandler: ServerMessagingHandler;
-    private clientMessagingHandler: ClientMessagingHandler;
+    private serverMessagingHandler: MessagingHandler;
+    private clientMessagingHandler: MessagingHandler;
     private store: any;
     constructor(client: Socket, server: Socket, serverMsgsActions: MsgAction[]) {
         this.client = client;
         this.server = server;
-        this.serverMessagingHandler = new ServerMessagingHandler(serverMsgsActions)
-        this.clientMessagingHandler = new ClientMessagingHandler([])
+        this.serverMessagingHandler = new MessagingHandler(serverMsgsActions,false)
+        this.clientMessagingHandler = new MessagingHandler([], true)
         this.store = store;
         let msgMap: MsgAction = {
             typeName: "MapComplementaryInformationsDataMessage",
