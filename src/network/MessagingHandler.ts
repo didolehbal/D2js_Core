@@ -12,15 +12,15 @@ export default class MessagingHandler {
     private currentHeader: Header | null = null
     public msgsActions: MsgAction[];
     private log: any
-    private isClient:boolean ;
+    private isClient: boolean;
     private lastInstanceID: number = 0
     private offsetInstanceID: number = 0
 
 
-    constructor(msgsActions: MsgAction[],isClient:boolean) {
+    constructor(msgsActions: MsgAction[], isClient: boolean) {
         this.msgsActions = msgsActions
         this.isClient = isClient
-        this.log = factory.getLogger(isClient?"Client":"Server");
+        this.log = factory.getLogger(isClient ? "Client" : "Server");
     }
 
 
@@ -32,6 +32,8 @@ export default class MessagingHandler {
     }
 
     public processChunk = (data: Buffer): Buffer => {
+
+        let { isClient } = this
         const headers: Header[] = []
 
         this.offset = 0
@@ -43,7 +45,7 @@ export default class MessagingHandler {
             // read new header if we're at the beggining of a new msg
             if (!this.currentHeader) {
                 //read header from buff
-                this.currentHeader = Header.fromRaw(this.buffer,this.isClient)
+                this.currentHeader = Header.fromRaw(this.buffer, isClient)
                 //if insufficient data in buffer end
                 if (!this.currentHeader) {
                     break;
@@ -82,9 +84,14 @@ export default class MessagingHandler {
                     }
                     this.message = null
 
-                    const newHeader = new Header(this.currentHeader.protocolID,
-                        rawMessage.length,
-                        this.currentHeader.instanceID + this.offsetInstanceID)
+                    let newHeader: Header
+                    if (isClient)
+                        newHeader = new Header(this.currentHeader.protocolID,
+                            rawMessage.length,
+                            this.currentHeader.instanceID + this.offsetInstanceID)
+                    else
+                        newHeader = new Header(this.currentHeader.protocolID,
+                            rawMessage.length)
 
                     data = Buffer.concat([
                         data.slice(0, this.offset),

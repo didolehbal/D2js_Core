@@ -6,7 +6,7 @@ test("Header to/from raw",()=>{
     const header2 = new Header(1,8)
 
     expect(header.toRaw()).toEqual(header2.toRaw())
-    expect(header2).toEqual(header)
+    expect(header2).toEqual(Header.fromRaw(header2.toRaw(),false))
 
 })
 
@@ -20,7 +20,6 @@ test("Header to/from raw",()=>{
     expect(header.bodyLength).toEqual(header2.bodyLength)
     expect(header.instanceID).toBeLessThan(header2.instanceID)
 
-    console.log(header2.toRaw())
     const header3 = Header.fromRaw(header2.toRaw(),true)
 
     expect(header2).toEqual(header3)

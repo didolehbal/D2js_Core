@@ -81,11 +81,14 @@ export default class Header {
     }
 
     public static fromRaw = (data: Buffer, isClient: boolean): Header | null => {
+        
+        const HeaderStaticLength = isClient? 6 : 2
 
-        if (data.length < 6)
+        if (data.length < HeaderStaticLength)
             return null
 
         let dw = new CustomDataWrapper(data)
+
 
         const hiHeader = dw.readUnsignedShort()
         const protocolID = hiHeader >> 2
@@ -95,7 +98,7 @@ export default class Header {
             throw new Error("Invalide LenType value : " + lenType)
         }
 
-        if (data.length < 6 + lenType)
+        if (data.length < HeaderStaticLength + lenType)
             return null
 
         let instanceID = 0
@@ -104,7 +107,7 @@ export default class Header {
 
         let bodyLength = 0
         if (lenType > 0) {
-            bodyLength = data.readUIntBE(6, lenType)
+            bodyLength = data.readUIntBE(HeaderStaticLength, lenType)
         }
         Header.incrementGID()
         return new Header(protocolID, bodyLength, instanceID);
