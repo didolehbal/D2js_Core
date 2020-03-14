@@ -1,20 +1,19 @@
-import ServerHeader from "./ServerHeader"
-import ClientHeader from "./ClientHeader"
+import Header from "./Header"
 
-test("serverHeader to/from raw",()=>{
+test("Header to/from raw",()=>{
 
-    const header = new ServerHeader(1,8)
-    const header2 = new ServerHeader(1,8)
+    const header = new Header(1,8)
+    const header2 = new Header(1,8)
 
     expect(header.toRaw()).toEqual(header2.toRaw())
     expect(header2).toEqual(header)
 
 })
 
-test("clientHeader to/from raw",()=>{
+test("Header to/from raw",()=>{
 
-    const header = new ClientHeader(1,8,0)
-    const header2 = new ClientHeader(1,8,1)
+    const header = new Header(1,8,2)
+    const header2 = new Header(1,8,3)
 
     expect(header.toRaw().length).toEqual(header2.toRaw().length)
     expect(header.protocolID).toEqual(header2.protocolID)
@@ -22,7 +21,7 @@ test("clientHeader to/from raw",()=>{
     expect(header.instanceID).toBeLessThan(header2.instanceID)
 
     console.log(header2.toRaw())
-    const header3 = ClientHeader.fromRaw(header2.toRaw())
+    const header3 = Header.fromRaw(header2.toRaw(),true)
 
     expect(header2).toEqual(header3)
 

@@ -1,9 +1,8 @@
-import Header from "../utils/ClientHeader"
+import Header from "../utils/Header"
 import { factory } from "../utils/Logger"
 import { deserialize, serialize } from "../utils/Protocol"
 import { MsgAction } from "../types"
 import CustomDataWrapper from "../utils/CustomDataWraper"
-import { getTypesFromName } from "../utils/Protocol"
 
 export default class ClientMessagingHandler {
 

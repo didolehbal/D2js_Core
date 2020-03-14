@@ -16,7 +16,7 @@ export default class Proxy {
         this.serverMessagingHandler = new ServerMessagingHandler(serverMsgsActions)
         this.clientMessagingHandler = new ClientMessagingHandler([])
         this.store = store;
-        let msg: MsgAction = {
+        let msgMap: MsgAction = {
             typeName: "MapComplementaryInformationsDataMessage",
             protocolId:226,
             alter: null,
@@ -24,7 +24,15 @@ export default class Proxy {
                 this.store.dispatch({ type: "MapComplementaryInformationsDataMessage", payload: data })
             }
         }
-        this.serverMessagingHandler.msgsActions.push(msg)
+        let msgRemoveElMap: MsgAction = {
+            typeName: "GameContextRemoveElementMessage",
+            protocolId:251,
+            alter: null,
+            doInBackground: (data: any) => {
+                this.store.dispatch({ type: "GameContextRemoveElementMessage", payload: data })
+            }
+        }
+        this.serverMessagingHandler.msgsActions.push(msgMap,msgRemoveElMap)
     }
 
     public sendToClient = (data: Buffer) => {
