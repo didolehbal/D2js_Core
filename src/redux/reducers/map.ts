@@ -10,9 +10,7 @@ export default function (state: any = {}, action: Action) {
                 [client_id]: {
                     ...data,
                     players: data.actors
-                        .filter((act: any) => act.bonesId == 1)
-                        .filter((act: any) => act.sellType == undefined)
-                        .filter((act: any) => act.npcId == undefined)
+                        .filter((act: any) => act.accountId != undefined)
                         .map((p: any) => ({ ...p, level: p.characterPower - p.contextualId })),
                     monsters: data.actors
                         .filter((act: any) => act.level)
@@ -29,7 +27,7 @@ export default function (state: any = {}, action: Action) {
                 }
             }
         case "GameRolePlayShowActorMessage":
-            if (data.bonesId == 1 && data.npcId == undefined) // if actor is a player
+            if (data.accountId != undefined) // if actor is a player
                 return {
                     ...state,
                     [client_id]: {
@@ -37,6 +35,17 @@ export default function (state: any = {}, action: Action) {
                         players: [
                             ...state[client_id]?.players,
                             { ...data, level: data.characterPower - data.contextualId }
+                        ]
+                    }
+                }
+            if (data.level != undefined)
+                return {
+                    ...state,
+                    [client_id]: {
+                        ...state[client_id],
+                        monsters: [
+                            ...state[client_id]?.monsters,
+                            { ...data, }
                         ]
                     }
                 }
@@ -92,5 +101,5 @@ export default function (state: any = {}, action: Action) {
                 }
             }
         default: return state
-}
+    }
 }

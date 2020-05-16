@@ -1,5 +1,6 @@
 import { getTypesFromName } from "../../utils/Protocol"
 import characterActions from "./character"
+import mapActions from "./map"
 export type MsgAction = {
   protocolId: number,
   typeName: string,
@@ -9,10 +10,12 @@ export type MsgAction = {
 
 export const actionsFactory = (client_id: number, store: any): { serverActions: MsgAction[], clientActions: MsgAction[] } => ({
   serverActions: [
-    ...characterActions(client_id, store).serverActions
+    ...characterActions(client_id, store).serverActions,
+    ...mapActions(client_id, store).serverActions
   ],
   clientActions: [
-    ...characterActions(client_id, store).clientActions
+    ...characterActions(client_id, store).clientActions,
+    ...mapActions(client_id, store).clientActions
   ]
 })
 
