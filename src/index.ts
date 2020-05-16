@@ -8,22 +8,17 @@ import { ObservableArrayFactory } from "./utils/ObservableArray"
 
 export const gameProxies = ObservableArrayFactory<Proxy>()
 
-export function startGameServer(address: string = "thanatena.ankama-games.com", port: number = 7778) {
-    const gameProxy = new GameProxyServer(address, port, gameProxies)
-    gameProxy.start()
-}
 export function spawnClient() {
     return hook()
 }
 
 
 export function startAuthServer() {
-    const authProxy = new AuthProxyServer()
+    const authProxy = new AuthProxyServer(gameProxies)
     authProxy.start()
 }
 
 startAuthServer()
-startGameServer()
 spawnClient()
 
 export const api = { attackPlayer, saveZaap, teleport, usePopoRappel, useObject }

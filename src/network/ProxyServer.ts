@@ -5,7 +5,7 @@ export default abstract class ProxyServer {
     protected _remoteAddress: string;
     protected _remotePort: number;
     protected _localPort: number;
-    
+
     constructor(remoteAddress: string, localPort: number, remotePort: number = 5555) {
         this._remoteAddress = remoteAddress;
         this._localPort = localPort;
@@ -13,6 +13,12 @@ export default abstract class ProxyServer {
         this._proxy = Net.createServer()
     }
 
+    get address() {
+        return this._remoteAddress
+    }
+    get port() {
+        return this._remotePort
+    }
     public start() {
 
         this._proxy.on("connection", this.handleConnection);
