@@ -1,7 +1,7 @@
 import Header from "../utils/Header"
 import { factory } from "../utils/Logger"
 import { deserialize, serialize } from "../utils/Protocol"
-import { MsgAction } from "../types"
+import {MsgAction} from "../redux/types"
 import CustomDataWrapper from "../utils/CustomDataWraper"
 
 export default class MessagingHandler {
@@ -13,11 +13,13 @@ export default class MessagingHandler {
     public msgsActions: MsgAction[];
     private log: any
     private isClient: boolean;
-    private lastInstanceID: number = 0
     private offsetInstanceID: number = 0
+    private sendToClient: Function;
+    private sendToServer: Function;
 
-
-    constructor(msgsActions: MsgAction[], isClient: boolean) {
+    constructor(msgsActions: MsgAction[], isClient: boolean, sendToServer: Function, sendToClient: Function) {
+        this.sendToServer = sendToServer;
+        this.sendToClient = sendToClient;
         this.msgsActions = msgsActions
         this.isClient = isClient
         this.log = factory.getLogger(isClient ? "Client" : "Server");
@@ -50,6 +52,12 @@ export default class MessagingHandler {
                 if (!this.currentHeader) {
                     break;
                 }
+
+                if (isClient && Header.Global_InstanceID != this.currentHeader.instanceID) {
+                    console.log(`old instanceID:${Header.GLOBAL_INSTANCE_ID}`)
+                    Header.GLOBAL_INSTANCE_ID = this.currentHeader.instanceID
+                }
+
                 this.log.debug(this.currentHeader.toString())
                 //check if this message is to alter
                 for (let i = 0; i < this.msgsActions.length; i++)
@@ -70,7 +78,13 @@ export default class MessagingHandler {
             if (this.buffer.length >= this.currentHeader.bodyLength) {
                 //update msg raw data
                 //raw message unmodified
+
                 let rawMessage = this.buffer.slice(0, this.currentHeader.bodyLength)
+                if (this.currentHeader.name == "TeleportRequestMessage") {
+                    console.log("TeleportRequestMessage !!",
+                     this.currentHeader.toRaw().toString("hex")+
+                     rawMessage.toString("hex"))
+                }
 
                 if (this.message) {
 
@@ -78,25 +92,26 @@ export default class MessagingHandler {
                     if (this.message.doInBackground != null)
                         this.message.doInBackground(msgContent)
 
+
                     if (this.message.alter != null) {
                         this.message.alter(msgContent)
                         rawMessage = serialize(new CustomDataWrapper(), msgContent, this.currentHeader.name)
+                        let newHeader: Header
+
+                        if (isClient)
+                            newHeader = new Header(this.currentHeader.protocolID,
+                                rawMessage.length,
+                                this.currentHeader.instanceID + this.offsetInstanceID)
+                        else
+                            newHeader = new Header(this.currentHeader.protocolID,
+                                rawMessage.length)
+
+                        data = Buffer.concat([
+                            data.slice(0, this.offset),
+                            newHeader.toRaw(), rawMessage,
+                            data.slice(this.offset + this.currentHeader.bodyLength + this.currentHeader.headerLength)])
                     }
                     this.message = null
-
-                    let newHeader: Header
-                    if (isClient)
-                        newHeader = new Header(this.currentHeader.protocolID,
-                            rawMessage.length,
-                            this.currentHeader.instanceID + this.offsetInstanceID)
-                    else
-                        newHeader = new Header(this.currentHeader.protocolID,
-                            rawMessage.length)
-
-                    data = Buffer.concat([
-                        data.slice(0, this.offset),
-                        newHeader.toRaw(), rawMessage,
-                        data.slice(this.offset + this.currentHeader.bodyLength + this.currentHeader.headerLength)])
                 }
 
                 this.offset += this.currentHeader.bodyLength + this.currentHeader.headerLength

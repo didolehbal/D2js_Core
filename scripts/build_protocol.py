@@ -212,8 +212,15 @@ if __name__ == "__main__":
         types_from_id = pickle.load(f)
         primitives = sorted(pickle.load(f))
     exports = ["types", "msg_from_id", "types_from_id", "primitives"]
-    with (args.labot_path / "protocol.js").open("w") as f:
+    #with (args.labot_path / "protocol.js").open("w") as f:
+    #    for name in exports:
+     #       f.write(f"{name} = ")
+      #      json.dump(eval(name), f)
+       #     f.write("\n")
+    with (args.labot_path / "protocol.json").open("w") as f:
+        f.write("{")
         for name in exports:
-            f.write(f"{name} = ")
+            f.write("\"" + f"{name}" +"\":")
             json.dump(eval(name), f)
-            f.write("\n")
+            f.write(",")
+        f.write("\"ok\":666}") # to fix the , at the end LMAO

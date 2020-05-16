@@ -2,11 +2,11 @@ import ProxyServer from "./ProxyServer";
 import {Socket} from "net"
 import Config from "../config.json"
 import Proxy from "./Proxy"
-import {MsgAction } from "../types"
+import {MsgAction} from "../redux/types"
 
 export default class AuthProxyServer extends ProxyServer {
     constructor() {
-        super(Config.authServerIps[1], Config.port)
+        super(Config.authServerIps[0], Config.port)
     }
     
    protected handleConnection = (dofusClient:Socket) => {

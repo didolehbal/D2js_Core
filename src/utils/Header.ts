@@ -7,7 +7,7 @@ export default class Header {
     protected _bodyLength: number = 0;
     protected _name: string;
     protected _instanceID: number = 0;
-    protected static GLOBAL_INSTANCE_ID: number = 0;
+    public static GLOBAL_INSTANCE_ID: number = 0;
     private _isClient: boolean = false;
     constructor(protocolID: number, bodyLength: number, instanceID: number = 0) {
         this._protocolID = protocolID;
@@ -88,7 +88,6 @@ export default class Header {
             return null
 
         let dw = new CustomDataWrapper(data)
-
 
         const hiHeader = dw.readUnsignedShort()
         const protocolID = hiHeader >> 2

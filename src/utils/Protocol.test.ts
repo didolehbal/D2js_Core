@@ -3,27 +3,42 @@ import CustomDataWrapper from "./CustomDataWraper"
 import Header from "./Header"
 
 
-test("deserialize", () => {
-  let raw = Buffer.from("65160168ef01001a7468616e6174656e612e616e6b616d612d67616d65732e636f6d0002000015b3000001bb0020afc276b4fe7ef8687068d4cc94364d90b9cde9a5a649958051fa2b1556690791001202320403000005000000000000000000d2010003000003000000000000000000cb010003000003000000000000000000ce010003000003000000000000000000d1010003000003000000000000000000d4010003000003000000000000000000240003000003000000000000000002ef01010300040542770b57f617700002c90100030001044277078bfe71000000cc010003000003000000000000000000cf010003000003000000000000000002160103000001000000000000000003de01000300010442770b08543ec00000630303000005000000000000000000ca010003000003000000000000000000cd010003000003000000000000000000d0010003000003000000000000000000d30100030000030000000000000000", "hex")
+test("serialize",()=>{
+  const hash =Buffer.from("4577A3A94792C7B2 82 17 A7 8C EC AA AD A6 D5 8B 3C B2 44 06 97 6D 0D 6D C6 10 CD 4D 13 8F 59 07 C0 7A 2D 2C E2 01 96 B7 B8 D4 E2 72 6B BB","hex")
+  const data = {
+    targetId:45456,
+    targetCellId:54,
+    friendly:false
+  }
 
-  //let raw = Buffer.from("580151002441e013e01de00000003c01bf04e1010000000000018201000000054178696f6d009d00080000000101999c030006477261696e6501ab01000994060800098f1d07c1ae5100000041e013e024a00000", "hex")
-  //let raw = Buffer.from("64d90a0001ef81b0a60d000115", "hex")
-  const header = Header.fromRaw(raw,false)
+
+  const raw = serialize(new CustomDataWrapper(),data,"GameRolePlayPlayerFightRequestMessage")
+  let header = new Header(5731,raw.length,Header.GLOBAL_INSTANCE_ID+1)
+
+})
+
+
+test("deserialize", () => {
+  
+  let raw = Buffer.from("56BD00004B7A05EF8184D10E", "hex")
+  const header = Header.fromRaw(raw,true)
+
   if(!header)
-  return
-//3570139375
-  let rawBody = raw.slice(header.lenType + 2)
-  //expect(rawBody.length).toBeGreaterThanOrEqual(header.length)
+    return
+
+  let rawBody = raw.slice(header.headerLength)
 
   const dataWrapper = new CustomDataWrapper(rawBody)
 
   let res = deserialize(dataWrapper, header.name)
   console.log(header.toString())
-  //console.log(res)
+  console.log(rawBody)
+
+  console.log(res)
   
   let rawRes = serialize(new CustomDataWrapper(), res, header.name)
 
-  expect(rawRes.length).toEqual(rawBody.length)
+  expect(raw.length).toEqual(rawBody.length + header.headerLength)
   expect(rawBody).toEqual(rawRes)
 
 })
@@ -87,4 +102,8 @@ test("read write AtomicVar", () => {
     const res = readAtomicType(dataWrapper, vars[i].desc)
     expect(res).toEqual(vars[i].value)
   }
+})
+test("header",()=>{
+  const head = Header.fromRaw(Buffer.from("598d0000000138","hex"),true)
+  console.log(head)
 })

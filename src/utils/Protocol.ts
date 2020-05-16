@@ -42,6 +42,7 @@ export function readAtomicType(data: CustomDataWrapper, desc: variable): {} {
             result = res
         }
         else {
+            
             result = data.read(desc.type)
         }
     } catch (ex) {
@@ -86,12 +87,11 @@ export function deserialize(data: CustomDataWrapper, typeName: string): {} {
 
     //handle vars
     msgSpec.vars.map(v => {
-        if (getPrimitives.includes(v.type)) {
+        if (getPrimitives.includes(v.type) ) {
             let res = readAtomicType(data, v)
             result = { ...result, [v.name]: res }
         }
         else {
-
             if (v.length == null) {
                 let type = v.type
                 if (type == "ID") {

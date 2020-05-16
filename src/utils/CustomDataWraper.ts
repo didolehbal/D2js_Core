@@ -1,6 +1,6 @@
 //import ByteArray  from "bytearray-node"
 //const bytearray : any = require("bytearray-node")
-
+import { UINT32 } from "cuint"
 export default class CustomDataWrapper {
 
    private static INT_SIZE: number = 32;
@@ -39,28 +39,32 @@ export default class CustomDataWrapper {
       switch (type) {
          case "UnsignedByte":
             return this.readUnsignedByte()
+         case "Byte":
+            return this.readByte()
          case "UnsignedShort":
             return this.readUnsignedShort()
          case "Short":
             return this.readShort()
-         case "VarLong":
-            return this.readVarLong()
-         case "VarUhInt":
-         case "VarInt":
-            return this.readVarInt()
+         case "Int":
+            return this.readInt()
          case "Boolean":
             return this.readBoolean()
          case "UTF":
             return this.readUTF()
+         case "Double":
+            return this.readDouble()
+
+         case "VarUhLong":
+            return this.readUInt64();
+         case "VarLong":
+            return this.readInt64()
+         case "VarUhInt":
+         case "VarInt":
+            return this.readVarInt()
          case "VarShort":
          case "VarUhShort":
             return this.readVarUhShort()
-         case "Int":
-            return this.readInt()
-         case "Byte":
-            return this.readByte()
-         case "Double":
-            return this.readDouble()
+
          default:
             throw new Error(`${type} not implemented`)
       }
@@ -73,8 +77,9 @@ export default class CustomDataWrapper {
          case "UnsignedShort":
          case "Short":
             return this.writeShort(value)
+         case "VarUhLong":
          case "VarLong":
-            return this.writeVarLong(value)
+            return this.writeVarLong2(value)
          case "VarUhInt":
          case "VarInt":
             return this.writeVarInt(value)
@@ -82,6 +87,7 @@ export default class CustomDataWrapper {
             return this.writeBoolean(value)
          case "UTF":
             return this.writeUTF(value)
+         case "VarShort":
          case "VarUhShort":
             return this.writeVarShort(value)
          case "Int":
@@ -226,6 +232,22 @@ export default class CustomDataWrapper {
       }
    }
 
+   public writeVarLong2(val:number) {
+      var cursor = 0;
+      let value = val;
+     // assert.ok(value >= -9223372036854775808 && value <= 9223372036854775807, "value is out of range for 64-bit varint"); // XXX: these numbers are actually unrepresentable in JS
+      while(value & 0x0fffffffffffff80) {
+        //buffer.writeUInt8(bitwise64.or(value & 0xFF), 0x80), offset + cursor);
+        this.writeByte((value & 0xFF)|0x80)
+        cursor++;
+        //value >>>= 7;
+        value /= Math.pow(2, 7);
+        value = Math.floor(value); // TODO: correct direction?
+      }
+      //buffer.writeUInt8(value, offset + cursor);
+      this.writeByte(value)
+    }
+
    public writeVarShort(value: number): void {
       if (value > CustomDataWrapper.SHORT_MAX_VALUE || value < CustomDataWrapper.SHORT_MIN_VALUE) {
          throw new Error("Forbidden value");
@@ -265,10 +287,9 @@ export default class CustomDataWrapper {
       this._data = Buffer.concat([this._data, buff])
    }
    public writeInt32(value: number): void {
-      while(value >= 128)
-      {
-            this.writeByte(value & 127 | 128);
-            value = value >>> 7;
+      while (value >= 128) {
+         this.writeByte(value & 127 | 128);
+         value = value >>> 7;
       }
       this.writeByte(value);
    }
@@ -284,10 +305,7 @@ export default class CustomDataWrapper {
       this._data = Buffer.concat([this._data, buff])
    }
 
-   public readVarLong(): number {
-      let res = this.readInt64();
-      return res;
-   }
+
 
    public readUnsignedByte(): number {
       let b = this._data.readUIntBE(this.position, 1)
@@ -310,7 +328,10 @@ export default class CustomDataWrapper {
             continue;
          }
          result.low = result.low | b << i;
-         return result.low + result.high;
+        // result.low = result.low&Number.parseInt("0000FFFF", 16)
+         //result.high = result.high&Number.parseInt("0000FFFF", 16)
+
+         return result.high << 32 | result.low;
       }
       if (b >= 128) {
          b = b & 127;
@@ -330,36 +351,42 @@ export default class CustomDataWrapper {
             i = i + 7;
          }
          result.high = result.high | b << i;
-         return result.low + result.high;
+
+        // result.low = result.low&Number.parseInt("0000FFFF", 16)
+      //result.high = result.high&Number.parseInt("0000FFFF", 16)
+
+         return result.high << 32 | result.low;
       }
       result.low = result.low | b << i;
       result.high = b >>> 4;
-      return result.low + result.high;
+
+      //result.low = result.low&Number.parseInt("0000FFFF", 16)
+      //result.high = result.high&Number.parseInt("0000FFFF", 16)
+      return result.high << 32 | result.low;
    }
 
    public writeVarLong(value: number): void {
       //TODO: varlong not working
       var i: number = 0;
-      var val = { low: 0, high: 0 }
-      val.low = value & Number.parseInt("0000FFFF", 16)
-      val.high = value & Number.parseInt("FFFF0000", 16)
+      
+      var low = value & Number.parseInt("0000FFFF", 16)
+      var high = value & Number.parseInt("FFFF0000", 16)
 
-
-      if (val.high == 0) {
-         this.writeInt32(val.low);
+      if (high  == 0) {
+         this.writeInt32(low);
       }
       else {
          for (i = 0; i < 4;) {
-            this.writeByte(val.low & 127 | 128);
-            val.low = val.low >>> 7;
+            this.writeByte(low & 127 | 128);
+            low = low >>> 7;
             i++;
          }
-         if ((val.high & 268435455 << 3) == 0) {
-            this.writeByte(val.high << 4 | val.low);
+         if ( (high & 268435455 >> 3) == 0) {
+            this.writeByte(high << 4 | low);
          }
          else {
-            this.writeByte((val.high << 4 | val.low) & 127 | 128);
-            this.writeInt32(val.high >>> 3);
+            this.writeByte((high << 4 | low) & 127 | 128);
+            this.writeInt32(high  >>> 3);
          }
       }
    }
@@ -380,6 +407,50 @@ export default class CustomDataWrapper {
       let buff = Buffer.alloc(4)
       buff.writeUInt32BE(value, 0)
       this._data = Buffer.concat([this._data, buff])
+   }
+
+   private readUInt64() {
+      var b: number = 0;
+      var low = UINT32(0);
+
+      var high = UINT32(0)
+      var i: number = 0;
+      while (true) {
+         b = this.readUnsignedByte();
+         if (i == 28) {
+            break;
+         }
+         if (b >= 128) {
+            low.fromNumber(low.toNumber() | (b & 127) << i);
+            i = i + 7;
+            continue;
+         }
+         low.fromNumber(low.toNumber() | b << i);
+         return high.rotl(32).or(low).toNumber()
+      }
+      if (b >= 128) {
+         b = b & 127;
+         low.fromNumber(low.toNumber() | b << i);
+         high.fromNumber(b >>> 4);
+         i = 3;
+         while (true) {
+            b = this.readUnsignedByte();
+            if (i < 32) {
+               if (b >= 128) {
+                  high.fromNumber(high.toNumber() | (b & 127) << i);
+               }
+               else {
+                  break;
+               }
+            }
+            i = i + 7;
+         }
+         high.fromNumber(high.toNumber() | b << i);
+         return high.rotl(32).or(low).toNumber()
+      }
+      low.fromNumber(low.toNumber() | b << i);
+      high.fromNumber(b >>> 4);
+      return high.rotl(32).or(low).toNumber()
    }
    /* 
    
@@ -629,7 +700,7 @@ export default class CustomDataWrapper {
       {
          b = b & 127;
          result.low = result.low | b << i;
-         result.high = b >>> 4;
+         high= b >>> 4;
          i = 3;
          while(true)
          {

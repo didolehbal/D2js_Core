@@ -3687,12 +3687,7 @@
       "protocolId": 101,
       "vars": [
         { "name": "jobId", "length": null, "type": "Byte", "optional": false },
-        {
-          "name": "skills",
-          "length": "Short",
-          "type": "ID",
-          "optional": false
-        }
+        { "name": "skills", "length": "Short", "type": "ID", "optional": false }
       ],
       "boolVars": [],
       "hash_function": false
@@ -5252,6 +5247,21 @@
           "name": "quantity",
           "length": null,
           "type": "VarUhInt",
+          "optional": false
+        }
+      ],
+      "boolVars": [],
+      "hash_function": false
+    },
+    "ForgettableSpellItem": {
+      "name": "ForgettableSpellItem",
+      "parent": "SpellItem",
+      "protocolId": 583,
+      "vars": [
+        {
+          "name": "available",
+          "length": null,
+          "type": "Boolean",
           "optional": false
         }
       ],
@@ -7757,6 +7767,27 @@
       "boolVars": [],
       "hash_function": false
     },
+    "ForgettableSpellsPreset": {
+      "name": "ForgettableSpellsPreset",
+      "parent": "Preset",
+      "protocolId": 584,
+      "vars": [
+        {
+          "name": "baseSpellsPreset",
+          "length": null,
+          "type": "SpellsPreset",
+          "optional": false
+        },
+        {
+          "name": "forgettableSpells",
+          "length": "Short",
+          "type": "SpellForPreset",
+          "optional": false
+        }
+      ],
+      "boolVars": [],
+      "hash_function": false
+    },
     "ItemsPreset": {
       "name": "ItemsPreset",
       "parent": "Preset",
@@ -7857,22 +7888,6 @@
           "type": "VarShort",
           "optional": false
         }
-      ],
-      "boolVars": [],
-      "hash_function": false
-    },
-    "CharacterBuildPreset": {
-      "name": "CharacterBuildPreset",
-      "parent": "PresetsContainerPreset",
-      "protocolId": 534,
-      "vars": [
-        {
-          "name": "iconId",
-          "length": null,
-          "type": "Short",
-          "optional": false
-        },
-        { "name": "name", "length": null, "type": "UTF", "optional": false }
       ],
       "boolVars": [],
       "hash_function": false
@@ -7993,6 +8008,22 @@
           "type": "VarShort",
           "optional": false
         }
+      ],
+      "boolVars": [],
+      "hash_function": false
+    },
+    "IconNamedPreset": {
+      "name": "IconNamedPreset",
+      "parent": "PresetsContainerPreset",
+      "protocolId": 585,
+      "vars": [
+        {
+          "name": "iconId",
+          "length": null,
+          "type": "Short",
+          "optional": false
+        },
+        { "name": "name", "length": null, "type": "UTF", "optional": false }
       ],
       "boolVars": [],
       "hash_function": false
@@ -8652,12 +8683,7 @@
       "protocolId": 6844,
       "vars": [
         { "name": "action", "length": null, "type": "Byte", "optional": false },
-        {
-          "name": "code",
-          "length": null,
-          "type": "VarUhShort",
-          "optional": false
-        }
+        { "name": "code", "length": null, "type": "Byte", "optional": false }
       ],
       "boolVars": [],
       "hash_function": false
@@ -8811,7 +8837,7 @@
         {
           "name": "ports",
           "length": "Short",
-          "type": "Int",
+          "type": "VarShort",
           "optional": false
         },
         {
@@ -9671,12 +9697,7 @@
       "parent": null,
       "protocolId": 6440,
       "vars": [
-        {
-          "name": "prisms",
-          "length": "Short",
-          "type": "ID",
-          "optional": false
-        }
+        { "name": "prisms", "length": "Short", "type": "ID", "optional": false }
       ],
       "boolVars": [],
       "hash_function": false
@@ -15122,7 +15143,7 @@
         {
           "name": "ports",
           "length": "Short",
-          "type": "Short",
+          "type": "VarShort",
           "optional": false
         },
         {
@@ -22228,12 +22249,7 @@
           "type": "GuildInsiderFactSheetInformations",
           "optional": false
         },
-        {
-          "name": "prisms",
-          "length": "Short",
-          "type": "ID",
-          "optional": false
-        }
+        { "name": "prisms", "length": "Short", "type": "ID", "optional": false }
       ],
       "boolVars": [],
       "hash_function": false
@@ -23857,7 +23873,7 @@
         {
           "name": "playerIds",
           "length": "Short",
-          "type": "VarLong",
+          "type": "VarUhLong",
           "optional": false
         },
         {
@@ -24290,6 +24306,64 @@
       "boolVars": [],
       "hash_function": false
     },
+    "ForgettableSpellDeleteMessage": {
+      "name": "ForgettableSpellDeleteMessage",
+      "parent": null,
+      "protocolId": 6867,
+      "vars": [
+        { "name": "reason", "length": null, "type": "Byte", "optional": false },
+        {
+          "name": "spells",
+          "length": "Short",
+          "type": "Int",
+          "optional": false
+        }
+      ],
+      "boolVars": [],
+      "hash_function": false
+    },
+    "ForgettableSpellEquipmentSlotsMessage": {
+      "name": "ForgettableSpellEquipmentSlotsMessage",
+      "parent": null,
+      "protocolId": 6870,
+      "vars": [
+        {
+          "name": "quantity",
+          "length": null,
+          "type": "VarShort",
+          "optional": false
+        }
+      ],
+      "boolVars": [],
+      "hash_function": false
+    },
+    "ForgettableSpellClientActionMessage": {
+      "name": "ForgettableSpellClientActionMessage",
+      "parent": null,
+      "protocolId": 6869,
+      "vars": [
+        { "name": "spellId", "length": null, "type": "Int", "optional": false },
+        { "name": "action", "length": null, "type": "Byte", "optional": false }
+      ],
+      "boolVars": [],
+      "hash_function": false
+    },
+    "ForgettableSpellListUpdateMessage": {
+      "name": "ForgettableSpellListUpdateMessage",
+      "parent": null,
+      "protocolId": 6868,
+      "vars": [
+        { "name": "action", "length": null, "type": "Byte", "optional": false },
+        {
+          "name": "spells",
+          "length": "Short",
+          "type": "ForgettableSpellItem",
+          "optional": false
+        }
+      ],
+      "boolVars": [],
+      "hash_function": false
+    },
     "CharacterCreationRequestMessage": {
       "name": "CharacterCreationRequestMessage",
       "parent": null,
@@ -24532,16 +24606,6 @@
       "boolVars": [],
       "hash_function": false
     },
-    "CharacterPresetSaveRequestMessage": {
-      "name": "CharacterPresetSaveRequestMessage",
-      "parent": "PresetSaveRequestMessage",
-      "protocolId": 6756,
-      "vars": [
-        { "name": "name", "length": null, "type": "UTF", "optional": false }
-      ],
-      "boolVars": [],
-      "hash_function": false
-    },
     "PresetSaveErrorMessage": {
       "name": "PresetSaveErrorMessage",
       "parent": null,
@@ -24596,9 +24660,36 @@
     },
     "IdolsPresetSaveRequestMessage": {
       "name": "IdolsPresetSaveRequestMessage",
-      "parent": "PresetSaveRequestMessage",
+      "parent": "IconPresetSaveRequestMessage",
       "protocolId": 6758,
       "vars": [],
+      "boolVars": [],
+      "hash_function": false
+    },
+    "IconPresetSaveRequestMessage": {
+      "name": "IconPresetSaveRequestMessage",
+      "parent": null,
+      "protocolId": 6872,
+      "vars": [
+        {
+          "name": "presetId",
+          "length": null,
+          "type": "Short",
+          "optional": false
+        },
+        {
+          "name": "symbolId",
+          "length": null,
+          "type": "Byte",
+          "optional": false
+        },
+        {
+          "name": "updateData",
+          "length": null,
+          "type": "Boolean",
+          "optional": false
+        }
+      ],
       "boolVars": [],
       "hash_function": false
     },
@@ -24633,33 +24724,6 @@
       "boolVars": [],
       "hash_function": false
     },
-    "PresetSaveRequestMessage": {
-      "name": "PresetSaveRequestMessage",
-      "parent": null,
-      "protocolId": 6761,
-      "vars": [
-        {
-          "name": "presetId",
-          "length": null,
-          "type": "Short",
-          "optional": false
-        },
-        {
-          "name": "symbolId",
-          "length": null,
-          "type": "Byte",
-          "optional": false
-        },
-        {
-          "name": "updateData",
-          "length": null,
-          "type": "Boolean",
-          "optional": false
-        }
-      ],
-      "boolVars": [],
-      "hash_function": false
-    },
     "PresetSavedMessage": {
       "name": "PresetSavedMessage",
       "parent": null,
@@ -24687,6 +24751,17 @@
           "type": "Short",
           "optional": false
         }
+      ],
+      "boolVars": [],
+      "hash_function": false
+    },
+    "IconNamedPresetSaveRequestMessage": {
+      "name": "IconNamedPresetSaveRequestMessage",
+      "parent": "IconPresetSaveRequestMessage",
+      "protocolId": 6871,
+      "vars": [
+        { "name": "name", "length": null, "type": "UTF", "optional": false },
+        { "name": "type", "length": null, "type": "Byte", "optional": false }
       ],
       "boolVars": [],
       "hash_function": false
@@ -25263,12 +25338,7 @@
       "parent": null,
       "protocolId": 6435,
       "vars": [
-        {
-          "name": "guilds",
-          "length": "Short",
-          "type": "ID",
-          "optional": false
-        }
+        { "name": "guilds", "length": "Short", "type": "ID", "optional": false }
       ],
       "boolVars": [],
       "hash_function": false
@@ -26978,12 +27048,7 @@
       "protocolId": 6844,
       "vars": [
         { "name": "action", "length": null, "type": "Byte", "optional": false },
-        {
-          "name": "code",
-          "length": null,
-          "type": "VarUhShort",
-          "optional": false
-        }
+        { "name": "code", "length": null, "type": "Byte", "optional": false }
       ],
       "boolVars": [],
       "hash_function": false
@@ -27137,7 +27202,7 @@
         {
           "name": "ports",
           "length": "Short",
-          "type": "Int",
+          "type": "VarShort",
           "optional": false
         },
         {
@@ -27997,12 +28062,7 @@
       "parent": null,
       "protocolId": 6440,
       "vars": [
-        {
-          "name": "prisms",
-          "length": "Short",
-          "type": "ID",
-          "optional": false
-        }
+        { "name": "prisms", "length": "Short", "type": "ID", "optional": false }
       ],
       "boolVars": [],
       "hash_function": false
@@ -33448,7 +33508,7 @@
         {
           "name": "ports",
           "length": "Short",
-          "type": "Short",
+          "type": "VarShort",
           "optional": false
         },
         {
@@ -40554,12 +40614,7 @@
           "type": "GuildInsiderFactSheetInformations",
           "optional": false
         },
-        {
-          "name": "prisms",
-          "length": "Short",
-          "type": "ID",
-          "optional": false
-        }
+        { "name": "prisms", "length": "Short", "type": "ID", "optional": false }
       ],
       "boolVars": [],
       "hash_function": false
@@ -42616,6 +42671,64 @@
       "boolVars": [],
       "hash_function": false
     },
+    "6867": {
+      "name": "ForgettableSpellDeleteMessage",
+      "parent": null,
+      "protocolId": 6867,
+      "vars": [
+        { "name": "reason", "length": null, "type": "Byte", "optional": false },
+        {
+          "name": "spells",
+          "length": "Short",
+          "type": "Int",
+          "optional": false
+        }
+      ],
+      "boolVars": [],
+      "hash_function": false
+    },
+    "6870": {
+      "name": "ForgettableSpellEquipmentSlotsMessage",
+      "parent": null,
+      "protocolId": 6870,
+      "vars": [
+        {
+          "name": "quantity",
+          "length": null,
+          "type": "VarShort",
+          "optional": false
+        }
+      ],
+      "boolVars": [],
+      "hash_function": false
+    },
+    "6869": {
+      "name": "ForgettableSpellClientActionMessage",
+      "parent": null,
+      "protocolId": 6869,
+      "vars": [
+        { "name": "spellId", "length": null, "type": "Int", "optional": false },
+        { "name": "action", "length": null, "type": "Byte", "optional": false }
+      ],
+      "boolVars": [],
+      "hash_function": false
+    },
+    "6868": {
+      "name": "ForgettableSpellListUpdateMessage",
+      "parent": null,
+      "protocolId": 6868,
+      "vars": [
+        { "name": "action", "length": null, "type": "Byte", "optional": false },
+        {
+          "name": "spells",
+          "length": "Short",
+          "type": "ForgettableSpellItem",
+          "optional": false
+        }
+      ],
+      "boolVars": [],
+      "hash_function": false
+    },
     "160": {
       "name": "CharacterCreationRequestMessage",
       "parent": null,
@@ -42858,16 +42971,6 @@
       "boolVars": [],
       "hash_function": false
     },
-    "6756": {
-      "name": "CharacterPresetSaveRequestMessage",
-      "parent": "PresetSaveRequestMessage",
-      "protocolId": 6756,
-      "vars": [
-        { "name": "name", "length": null, "type": "UTF", "optional": false }
-      ],
-      "boolVars": [],
-      "hash_function": false
-    },
     "6762": {
       "name": "PresetSaveErrorMessage",
       "parent": null,
@@ -42922,9 +43025,36 @@
     },
     "6758": {
       "name": "IdolsPresetSaveRequestMessage",
-      "parent": "PresetSaveRequestMessage",
+      "parent": "IconPresetSaveRequestMessage",
       "protocolId": 6758,
       "vars": [],
+      "boolVars": [],
+      "hash_function": false
+    },
+    "6872": {
+      "name": "IconPresetSaveRequestMessage",
+      "parent": null,
+      "protocolId": 6872,
+      "vars": [
+        {
+          "name": "presetId",
+          "length": null,
+          "type": "Short",
+          "optional": false
+        },
+        {
+          "name": "symbolId",
+          "length": null,
+          "type": "Byte",
+          "optional": false
+        },
+        {
+          "name": "updateData",
+          "length": null,
+          "type": "Boolean",
+          "optional": false
+        }
+      ],
       "boolVars": [],
       "hash_function": false
     },
@@ -42959,33 +43089,6 @@
       "boolVars": [],
       "hash_function": false
     },
-    "6761": {
-      "name": "PresetSaveRequestMessage",
-      "parent": null,
-      "protocolId": 6761,
-      "vars": [
-        {
-          "name": "presetId",
-          "length": null,
-          "type": "Short",
-          "optional": false
-        },
-        {
-          "name": "symbolId",
-          "length": null,
-          "type": "Byte",
-          "optional": false
-        },
-        {
-          "name": "updateData",
-          "length": null,
-          "type": "Boolean",
-          "optional": false
-        }
-      ],
-      "boolVars": [],
-      "hash_function": false
-    },
     "6763": {
       "name": "PresetSavedMessage",
       "parent": null,
@@ -43013,6 +43116,17 @@
           "type": "Short",
           "optional": false
         }
+      ],
+      "boolVars": [],
+      "hash_function": false
+    },
+    "6871": {
+      "name": "IconNamedPresetSaveRequestMessage",
+      "parent": "IconPresetSaveRequestMessage",
+      "protocolId": 6871,
+      "vars": [
+        { "name": "name", "length": null, "type": "UTF", "optional": false },
+        { "name": "type", "length": null, "type": "Byte", "optional": false }
       ],
       "boolVars": [],
       "hash_function": false
@@ -43589,12 +43703,7 @@
       "parent": null,
       "protocolId": 6435,
       "vars": [
-        {
-          "name": "guilds",
-          "length": "Short",
-          "type": "ID",
-          "optional": false
-        }
+        { "name": "guilds", "length": "Short", "type": "ID", "optional": false }
       ],
       "boolVars": [],
       "hash_function": false
@@ -48877,12 +48986,7 @@
       "protocolId": 101,
       "vars": [
         { "name": "jobId", "length": null, "type": "Byte", "optional": false },
-        {
-          "name": "skills",
-          "length": "Short",
-          "type": "ID",
-          "optional": false
-        }
+        { "name": "skills", "length": "Short", "type": "ID", "optional": false }
       ],
       "boolVars": [],
       "hash_function": false
@@ -50442,6 +50546,21 @@
           "name": "quantity",
           "length": null,
           "type": "VarUhInt",
+          "optional": false
+        }
+      ],
+      "boolVars": [],
+      "hash_function": false
+    },
+    "583": {
+      "name": "ForgettableSpellItem",
+      "parent": "SpellItem",
+      "protocolId": 583,
+      "vars": [
+        {
+          "name": "available",
+          "length": null,
+          "type": "Boolean",
           "optional": false
         }
       ],
@@ -52947,6 +53066,27 @@
       "boolVars": [],
       "hash_function": false
     },
+    "584": {
+      "name": "ForgettableSpellsPreset",
+      "parent": "Preset",
+      "protocolId": 584,
+      "vars": [
+        {
+          "name": "baseSpellsPreset",
+          "length": null,
+          "type": "SpellsPreset",
+          "optional": false
+        },
+        {
+          "name": "forgettableSpells",
+          "length": "Short",
+          "type": "SpellForPreset",
+          "optional": false
+        }
+      ],
+      "boolVars": [],
+      "hash_function": false
+    },
     "517": {
       "name": "ItemsPreset",
       "parent": "Preset",
@@ -53047,22 +53187,6 @@
           "type": "VarShort",
           "optional": false
         }
-      ],
-      "boolVars": [],
-      "hash_function": false
-    },
-    "534": {
-      "name": "CharacterBuildPreset",
-      "parent": "PresetsContainerPreset",
-      "protocolId": 534,
-      "vars": [
-        {
-          "name": "iconId",
-          "length": null,
-          "type": "Short",
-          "optional": false
-        },
-        { "name": "name", "length": null, "type": "UTF", "optional": false }
       ],
       "boolVars": [],
       "hash_function": false
@@ -53183,6 +53307,22 @@
           "type": "VarShort",
           "optional": false
         }
+      ],
+      "boolVars": [],
+      "hash_function": false
+    },
+    "585": {
+      "name": "IconNamedPreset",
+      "parent": "PresetsContainerPreset",
+      "protocolId": 585,
+      "vars": [
+        {
+          "name": "iconId",
+          "length": null,
+          "type": "Short",
+          "optional": false
+        },
+        { "name": "name", "length": null, "type": "UTF", "optional": false }
       ],
       "boolVars": [],
       "hash_function": false
@@ -53747,5 +53887,6 @@
     "VarUhInt",
     "VarUhLong",
     "VarUhShort"
-  ]
+  ],
+  "ok": 666
 }

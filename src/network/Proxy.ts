@@ -1,55 +1,62 @@
 import { Socket } from "net";
 import MessagingHandler from "./MessagingHandler";
-import { MsgAction } from "../types"
+import { MsgAction } from "../redux/types"
 import { store } from "../redux/store"
+import {Action} from "../redux/types"
+import {actionsFactory} from "../redux/actions"
+import { Store } from "redux"
 
+let instance_id = 0
 export default class Proxy {
     private client: Socket;
     private server: Socket;
+    public readonly id: number
     private serverMessagingHandler: MessagingHandler;
     private clientMessagingHandler: MessagingHandler;
-    private store: any;
+    private _store: Store<any, Action>;
+
     constructor(client: Socket, server: Socket, serverMsgsActions: MsgAction[]) {
         this.client = client;
         this.server = server;
-        this.serverMessagingHandler = new MessagingHandler(serverMsgsActions,false)
-        this.clientMessagingHandler = new MessagingHandler([], true)
-        this.store = store;
-        let msgMap: MsgAction = {
-            typeName: "MapComplementaryInformationsDataMessage",
-            protocolId:226,
-            alter: null,
-            doInBackground: (data: any) => {
-                this.store.dispatch({ type: "MapComplementaryInformationsDataMessage", payload: data })
-            }
-        }
-        let msgRemoveElMap: MsgAction = {
-            typeName: "GameContextRemoveElementMessage",
-            protocolId:251,
-            alter: null,
-            doInBackground: (data: any) => {
-                this.store.dispatch({ type: "GameContextRemoveElementMessage", payload: data })
-            }
-        }
-        this.serverMessagingHandler.msgsActions.push(msgMap,msgRemoveElMap)
+        this.serverMessagingHandler = new MessagingHandler(serverMsgsActions, false, this.sendToServer, this.sendToClient)
+        this.clientMessagingHandler = new MessagingHandler([], true, this.sendToServer, this.sendToClient)
+        this.id = ++instance_id
+        this._store = store;
+
+        this.init_actions()
+    }
+    get store() {
+        return this._store
+    }
+    getState() {
+        return this._store.getState()[this.id]
+    }
+    public init_actions() {
+        let actions = actionsFactory(this.id, this.store)
+        actions.serverActions.map(action => this.serverMessagingHandler.msgsActions.push(action))
+        actions.clientActions.map(action => this.clientMessagingHandler.msgsActions.push(action))
     }
 
     public sendToClient = (data: Buffer) => {
         let flushed = this.client.write(data);
-        if (!flushed) {
-            console.log("/!\ client not flushed; pausing local");
-            this.server.pause();
-        }
+        /* if (!flushed) {
+             console.log("/!\ client not flushed; pausing local");
+             this.server.pause();
+         }*/
     }
 
     public sendToServer = (data: Buffer) => {
         let flushed = this.server.write(data);
-        if (!flushed) {
+        /*if (!flushed) {
             console.log("/!\ server not flushed; pausing local");
             this.client.pause();
-        }
+        }*/
     }
 
+    public disconnect = () => {
+        this.server.end(() => console.log("disconnecting from server..."))
+        this.client.end(() => console.log("disconnecting from client..."))
+    }
     public actionToServer(action: MsgAction) {
         this.serverMessagingHandler.msgsActions.push(action)
     }
@@ -65,7 +72,6 @@ export default class Proxy {
                 this.clientMessagingHandler.reset()
             }
         })
-
         server.on("data", (data) => {
             try {
                 const processedData: Buffer = this.serverMessagingHandler.processChunk(data)
@@ -82,14 +88,21 @@ export default class Proxy {
             server.resume();
         });
 
-        client.on('close', function (had_error) {
+        /*client.on('close', function (had_error) { // Implemented upon connection
             console.log("Client Disconnected", { error: had_error })
             server.end();
-        });
+        });*/
         server.on('drain', function () {
             client.resume();
         });
 
+        client.on('error', function (err) {
+            console.log(err)
+        });
+
+        server.on('error', function (err) {
+            console.log(err)
+        });
         server.on('close', function (had_error: any) {
             console.log("Server Disconnected", { error: had_error })
             client.end();
