@@ -11,10 +11,15 @@ const serverActions: string[] = [
     "PartyDeletedMessage",
     "PartyMemberInStandardFightMessage",
     "PartyNewMemberMessage",
-    "GameFightStartingMessage",
+    "PartyUpdateMessage",
+    "GameFightStartingMessage", // fight preparation started
     "GameFightTurnStartMessage",
     "GameFightTurnEndMessage",
-    "GameFightEndMessage"
+    "GameFightEndMessage",
+    "GameFightStartMessage",// fight started
+    "GameFightJoinMessage",// join success
+    "GameFightHumanReadyStateMessage", // a player is ready
+    //"GameRolePlayRemoveChallengeMessage",// remove fight sword from map
 ]
 const clientActions: string[] = []
 

@@ -5,6 +5,7 @@
   "license": "MIT",
   "scripts": {
     "start": "tsc --declaration && node ./build/index.js",
+    "compile" :"tsc --declaration",
     "test": "jest"
   },
   "devDependencies": {

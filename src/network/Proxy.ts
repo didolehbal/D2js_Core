@@ -2,8 +2,8 @@ import { Socket } from "net";
 import MessagingHandler from "./MessagingHandler";
 import { MsgAction } from "../redux/types"
 import { store } from "../redux/store"
-import {Action} from "../redux/types"
-import {actionsFactory} from "../redux/actions"
+import { Action, State } from "../redux/types"
+import { actionsFactory } from "../redux/actions"
 import { Store } from "redux"
 
 let instance_id = 0
@@ -13,7 +13,7 @@ export default class Proxy {
     public readonly id: number
     private serverMessagingHandler: MessagingHandler;
     private clientMessagingHandler: MessagingHandler;
-    private _store: Store<any, Action>;
+    private _store: Store<State, Action>;
 
     constructor(client: Socket, server: Socket, serverMsgsActions: MsgAction[]) {
         this.client = client;
@@ -22,14 +22,17 @@ export default class Proxy {
         this.clientMessagingHandler = new MessagingHandler([], true, this.sendToServer, this.sendToClient)
         this.id = ++instance_id
         this._store = store;
-
         this.init_actions()
     }
     get store() {
         return this._store
     }
     getState() {
-        return this._store.getState()[this.id]
+        const state = this._store.getState()
+        return {
+            character: state.character[this.id],
+            map: state.map[this.id],
+        }
     }
     public init_actions() {
         let actions = actionsFactory(this.id, this.store)

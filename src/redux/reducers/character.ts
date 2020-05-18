@@ -1,7 +1,9 @@
-import { Action } from "../types"
+import { Action, CharacterState } from "../types"
 import { DoubleToVarLong } from "../../utils/convert"
 
-export default function (state: any = {}, action: Action) {
+
+
+export default function (state: CharacterState = {}, action: Action) {
     const { data, client_id } = action.payload || { data: 0, client_id: 0 }
     switch (action.type) {
         case "CharacterSelectedSuccessMessage":
@@ -87,46 +89,66 @@ export default function (state: any = {}, action: Action) {
                     }
                 }
             }
+        case "PartyMemberInStandardFightMessage":
+            return {
+                ...state, [client_id]: {
+                    ...state[client_id],
+                    memberInFight: data
+                }
+            } 
         case "GameFightStartingMessage":
             return {
                 ...state, [client_id]: {
                     ...state[client_id],
-                    fight: {
-                        ...state[client_id]?.fight,
-                        inFight: true,
-                        isMyTurn: false
-                    }
+                    inFightPreparation: true
+                }
+            }
+        case "PartyUpdateMessage":
+            return {
+                ...state, [client_id]: {
+                    ...state[client_id],
+                    partyUpdates:state[client_id].partyUpdates?[...state[client_id].partyUpdates ,data]:[data]
+                }
+            }
+        case "GameFightHumanReadyStateMessage":
+            if(data.characterId == state[client_id].id)
+            return {
+                ...state, [client_id]: {
+                    ...state[client_id],
+                    isReady:data.isReady
+                }
+            }
+            else return state
+        case "GameFightStartMessage":
+            return {
+                ...state, [client_id]: {
+                    ...state[client_id],
+                    inFightPreparation: false,
+                    isReady:false,
+                    inFight: true,
+                    isMyTurn: false
                 }
             }
         case "GameFightEndMessage":
             return {
                 ...state, [client_id]: {
                     ...state[client_id],
-                    fight: {
-                        ...state[client_id]?.fight,
-                        inFight: false,
-                        isMyTurn: false
-                    }
+                    inFight: false,
+                    isMyTurn: false
                 }
             }
         case "GameFightTurnStartMessage":
             return {
                 ...state, [client_id]: {
                     ...state[client_id],
-                    fight: {
-                        ...state[client_id]?.fight,
-                        isMyTurn: state[client_id].id == DoubleToVarLong(data.id)
-                    }
+                    isMyTurn: state[client_id].id == DoubleToVarLong(data.id)
                 }
             }
         case "GameFightTurnEndMessage":
             return {
                 ...state, [client_id]: {
                     ...state[client_id],
-                    fight: {
-                        ...state[client_id]?.fight,
-                        isMyTurn: !(state[client_id].id == DoubleToVarLong(data.id))
-                    }
+                    isMyTurn: !(state[client_id].id == DoubleToVarLong(data.id))
                 }
             }
         default:
