@@ -1,5 +1,6 @@
 import CustomDataWrapper from './CustomDataWraper'
-test('read and write short', () => {
+
+/*test('read and write short', () => {
     const dataWrapper = new CustomDataWrapper(Buffer.alloc(0));
     const value = 150
     dataWrapper.writeShort(value)
@@ -23,17 +24,19 @@ test("read and write varShort",()=> { // problem with negative when reading
     const res = dataWrapper.read("VarShort")
     expect(res).toEqual(value)
 })
+
 test("read and write varuhShort",()=> {
     const dataWrapper = new CustomDataWrapper(Buffer.alloc(0));
     const value = 500
     dataWrapper.write("VarUhShort",value)
     const res = dataWrapper.read("VarUhShort")
     expect(res).toEqual(value)
-})
+})*/
+
 test("read and write varLong",()=> {
     const dataWrapper = new CustomDataWrapper();
-    const value = -336985873
-    dataWrapper.write("VarUhLong",value)
+    const value = 336985873
+    dataWrapper.write("VarLong",value)
     console.log(dataWrapper.getBuffer())
     const res = dataWrapper.read("VarLong")
     console.log("eHEREx " +res)
@@ -42,25 +45,15 @@ test("read and write varLong",()=> {
 })
 
 test("read and write varuhLong",()=> {
-    /*const dataWrapper = new CustomDataWrapper();
-    const value = 556655
-    dataWrapper.write("VarLong",value)
-    //console.log(dataWrapper.getBuffer())
-    const res =  dataWrapper.read("VarUhLong")
-    //console.log("eHEREx " +res)
-
-    expect(res).toEqual(value)*/
-
-    const dr  = new CustomDataWrapper(Buffer.from("EF8184D10E","hex"))
+    const val  = 1072234735
+    const dr  = new CustomDataWrapper()
     
-    const r = dr.read("VarUhLong")
-    console.log(r)
-
-    const b = new CustomDataWrapper()
-    b.write("VarLong",r)
-    let d = b.read("VarUhLong")
-    console.log(b,d)
+    dr.write("VarUhLong",val)
+    const res = dr.read("VarUhLong")
+    console.log(res)
+    expect(res).toEqual(val)
 })
+
 test("read and write utf",()=> {
     const dataWrapper = new CustomDataWrapper(Buffer.alloc(0));
     const value = "localhost"

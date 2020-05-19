@@ -53,10 +53,10 @@ export const passeTour = (isAfk: boolean) => {
 }
 
 export const readyFight = (isReady: boolean) => {
-    const type = types["GameFightJoinRequestMessage"]
+    const type = types["GameFightReadyMessage"]
 
     const data = {
-        isReady,
+        isReady
     }
     const raw = serialize(new CustomDataWrapper(), data, type.name)
     let header = new Header(type.protocolId, raw.length, Header.GLOBAL_INSTANCE_ID + 1)

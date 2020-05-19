@@ -73,7 +73,7 @@ export default class Header {
 
         if (this._lenType > 0) {
             let bodyLengthBff = Buffer.alloc(this._lenType)
-            bodyLengthBff.writeIntBE(this._bodyLength, 0, this._lenType)
+            bodyLengthBff.writeUIntBE(this._bodyLength, 0, this._lenType)
             dw.writeBytes(bodyLengthBff)
         }
 

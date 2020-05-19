@@ -18,7 +18,7 @@ test("serialize", () => {
 
 test("deserialize", () => {
 
-  let raw = Buffer.from("026533ef81a8df1e0006446f636b65720d01000214ec0f0005014f42160206ca1603184a1c040497100546d451000182010000020001", "hex")
+  let raw = Buffer.from("0ed900000087400003721b620d61f141a2580e08000000bda5769fb06be40246fb262bd34a1a2f9347839ec430eb49f8f2f7001a9904d9b4d6a4c06493eeefe37849863c15328b", "hex")
   const header = Header.fromRaw(raw, true)
   if (!header)
     return
@@ -28,7 +28,7 @@ test("deserialize", () => {
   const dataWrapper = new CustomDataWrapper(rawBody)
 
   let res:any = deserialize(dataWrapper, header.name)
-  console.log(res.id)
+  console.log(res)
 
 })
 

@@ -54,9 +54,8 @@ export default class CustomDataWrapper {
             return this.readUTF()
          case "Double":
             return this.readDouble()
-
          case "VarUhLong":
-            return this.readUInt64();
+            return this.readVarLong();
          case "VarLong":
             return this.readInt64()
          case "VarUhInt":
@@ -103,24 +102,24 @@ export default class CustomDataWrapper {
       }
    }
     readVarLong() {
+       console.log(" read var long called")
       var result:Long = new Long(0,0,true);
       var shift = 0;
       var cursor = this.position;
     
       while(true) {
         if(cursor + 1 > this._data.length)
-          console.log("error")
-        var b = this._data.readUInt8(cursor);
+          console.log("error cursor + 1 > this._data.length")
+        var b = this.readUnsignedByte();
     
         result = result.or((b & 0x7f) * Math.pow(2, shift)); // 53-bit safe
         //result |= ((b & 0x7f) << shift); // Add the bits to our number, except MSB
         cursor++;
         if(!(b & 0x80)) { // If the MSB is not set, we return the number
-         this.position += cursor
           return result.toNumber()
         }
         shift += 7; // we only have 7 bits, MSB being the return-trigger
-        console.log("error")
+        //console.log("error")
         // TODO: fix overflow when >53-bit
         //assert.ok(shift < 64, "varint is too big"); // Make sure our shift don't overflow.
       }

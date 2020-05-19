@@ -33,7 +33,7 @@ export default function (state: CharacterState = {}, action: Action) {
                 ...state, [client_id]: {
                     ...state[client_id],
                     groupe: {
-                        ...data
+                        ...data,
                     }
                 }
             }

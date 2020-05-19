@@ -52,7 +52,7 @@ export default class MessagingHandler {
                 if (!this.currentHeader) {
                     break;
                 }
-
+              
                 if (isClient && Header.Global_InstanceID != this.currentHeader.instanceID) {
                     console.log(`old instanceID:${Header.GLOBAL_INSTANCE_ID}`)
                     Header.GLOBAL_INSTANCE_ID = this.currentHeader.instanceID
@@ -78,15 +78,12 @@ export default class MessagingHandler {
             if (this.buffer.length >= this.currentHeader.bodyLength) {
                 //update msg raw data
                 //raw message unmodified
-
                 let rawMessage = this.buffer.slice(0, this.currentHeader.bodyLength)
-             
-                if (this.currentHeader.name == "CharacterSelectedSuccessMessage") {
-                    console.log("CharacterSelectedSuccessMessage !!",
+                if (this.currentHeader.name == "PartyJoinMessage") {
+                    console.log("PartyJoinMessage !!",
                      this.currentHeader.toRaw().toString("hex")+
                      rawMessage.toString("hex"))
                 }
-
                 if (this.message) {
 
                     let msgContent = deserialize(new CustomDataWrapper(rawMessage), this.currentHeader.name)
