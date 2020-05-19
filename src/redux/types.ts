@@ -14,7 +14,13 @@ export type MsgAction = {
 type Groupe = {
     partyId: number
     members: Actor[]
-    memberFightInMap: {}
+
+    partyType: number
+    partyLeaderId: number
+    maxParticipants: number
+    guests: Array<any>
+    restricted: number
+    partyName: number
 }
 type Object = {
     position: number
@@ -43,10 +49,10 @@ export type Character = {
     inventory: inventory
     isMyTurn: boolean
     inFight: boolean
-    inFightPreparation:boolean
-    isReady:boolean
+    inFightPreparation: boolean
+    isReady: boolean
     groupe: Groupe
-    partyUpdates:[]
+    partyUpdates: []
 }
 type Actor = {
     contextualId: number
@@ -96,6 +102,9 @@ export type Map = {
     mapId: number
     obstacles: []
     fights: Fight[]
+    fightCount: number
+    //runningFights:any
+    updateTeam: any
     hasAggressiveMonsters: boolean
     actors: Actor[]
     players: Actor[]
@@ -111,5 +120,5 @@ export type MapState = {
 }
 export type State = {
     character: CharacterState
-    map : MapState
+    map: MapState
 }

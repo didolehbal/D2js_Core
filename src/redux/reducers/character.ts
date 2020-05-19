@@ -64,7 +64,7 @@ export default function (state: CharacterState = {}, action: Action) {
                     groupe: null
                 }
             }
-        case "PartyMemberInStandardFightMessage":
+       /* case "PartyMemberInStandardFightMessage":
             return {
                 ...state, [client_id]: {
                     ...state[client_id],
@@ -75,7 +75,7 @@ export default function (state: CharacterState = {}, action: Action) {
                         }
                     }
                 }
-            }
+            }*/
         case "PartyNewMemberMessage":
             return {
                 ...state, [client_id]: {
@@ -89,13 +89,6 @@ export default function (state: CharacterState = {}, action: Action) {
                     }
                 }
             }
-        case "PartyMemberInStandardFightMessage":
-            return {
-                ...state, [client_id]: {
-                    ...state[client_id],
-                    memberInFight: data
-                }
-            } 
         case "GameFightStartingMessage":
             return {
                 ...state, [client_id]: {
@@ -103,13 +96,13 @@ export default function (state: CharacterState = {}, action: Action) {
                     inFightPreparation: true
                 }
             }
-        case "PartyUpdateMessage":
+       /* case "PartyUpdateMessage":
             return {
                 ...state, [client_id]: {
                     ...state[client_id],
                     partyUpdates:state[client_id].partyUpdates?[...state[client_id].partyUpdates ,data]:[data]
                 }
-            }
+            }*/
         case "GameFightHumanReadyStateMessage":
             if(data.characterId == state[client_id].id)
             return {

@@ -1,7 +1,7 @@
-import { Action } from "../types"
+import { Action, MapState } from "../types"
 import { DoubleToVarLong } from "../../utils/convert"
 
-export default function (state: any = {}, action: Action) {
+export default function (state: MapState = {}, action: Action) {
     const { data, client_id } = action.payload || { data: 0, client_id: 0 }
     switch (action.type) {
         case "MapComplementaryInformationsDataMessage":
@@ -98,6 +98,44 @@ export default function (state: any = {}, action: Action) {
                     ...state[client_id],
                     statedElements:
                         state[client_id]?.statedElements?.map((element: any) => element.elementId == data.elementId ? data : element)
+                }
+            }
+        case "MapFightCountMessage":
+            return {
+                ...state, [client_id]: {
+                    ...state[client_id],
+                    fightCount: data.fightCount
+                }
+            }
+        case "GameRolePlayShowChallengeMessage":
+            return {
+                ...state, [client_id]: {
+                    ...state[client_id],
+                    fights: state[client_id].fights ? [...state[client_id].fights, data] : [data]
+                }
+            }
+        case "GameFightUpdateTeamMessage":
+            return {
+                ...state, [client_id]: {
+                    ...state[client_id],
+                    fights: state[client_id].fights.map((fight: any) => {
+                        if (fight.fightId != data.fightId) return fight
+                        else return {
+                            ...fight,
+                            fightTeams: fight.fightTeams.map((team: any) => {
+                                if (team.teamId != data.teamId)
+                                    return team
+                                else return { ...data, fightId: undefined }
+                            })
+                        }
+                    })
+                }
+            }
+        case "GameRolePlayRemoveChallengeMessage":
+            return {
+                ...state, [client_id]: {
+                    ...state[client_id],
+                    fights: state[client_id].fights.filter((fight: any) => fight.fightId != data.fightId)
                 }
             }
         default: return state

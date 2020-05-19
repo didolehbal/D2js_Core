@@ -1,6 +1,7 @@
 //import ByteArray  from "bytearray-node"
 //const bytearray : any = require("bytearray-node")
-import { UINT32 } from "cuint"
+import Long from "long"
+
 export default class CustomDataWrapper {
 
    private static INT_SIZE: number = 32;
@@ -101,6 +102,29 @@ export default class CustomDataWrapper {
             throw new Error(`${type} not implemented`)
       }
    }
+    readVarLong() {
+      var result:Long = new Long(0,0,true);
+      var shift = 0;
+      var cursor = this.position;
+    
+      while(true) {
+        if(cursor + 1 > this._data.length)
+          console.log("error")
+        var b = this._data.readUInt8(cursor);
+    
+        result = result.or((b & 0x7f) * Math.pow(2, shift)); // 53-bit safe
+        //result |= ((b & 0x7f) << shift); // Add the bits to our number, except MSB
+        cursor++;
+        if(!(b & 0x80)) { // If the MSB is not set, we return the number
+         this.position += cursor
+          return result.toNumber()
+        }
+        shift += 7; // we only have 7 bits, MSB being the return-trigger
+        console.log("error")
+        // TODO: fix overflow when >53-bit
+        //assert.ok(shift < 64, "varint is too big"); // Make sure our shift don't overflow.
+      }
+    }
 
    public readShort(): number {
       let res = this._data.readInt16BE(this.position)
@@ -315,7 +339,7 @@ export default class CustomDataWrapper {
 
    private readInt64(): number {
       var b: number = 0;
-      var result = { low: 0, high: 0 }
+      var result = Long.fromInt(0)
       var i: number = 0;
       while (true) {
          b = this.readUnsignedByte();
@@ -328,10 +352,8 @@ export default class CustomDataWrapper {
             continue;
          }
          result.low = result.low | b << i;
-        // result.low = result.low&Number.parseInt("0000FFFF", 16)
-         //result.high = result.high&Number.parseInt("0000FFFF", 16)
 
-         return result.high << 32 | result.low;
+         return result.toNumber()
       }
       if (b >= 128) {
          b = b & 127;
@@ -352,17 +374,12 @@ export default class CustomDataWrapper {
          }
          result.high = result.high | b << i;
 
-        // result.low = result.low&Number.parseInt("0000FFFF", 16)
-      //result.high = result.high&Number.parseInt("0000FFFF", 16)
-
-         return result.high << 32 | result.low;
+         return result.toNumber()
       }
       result.low = result.low | b << i;
       result.high = b >>> 4;
 
-      //result.low = result.low&Number.parseInt("0000FFFF", 16)
-      //result.high = result.high&Number.parseInt("0000FFFF", 16)
-      return result.high << 32 | result.low;
+      return result.toNumber()
    }
 
    public writeVarLong(value: number): void {
@@ -411,9 +428,7 @@ export default class CustomDataWrapper {
 
    private readUInt64() {
       var b: number = 0;
-      var low = UINT32(0);
-
-      var high = UINT32(0)
+      var result = Long.fromInt(0,true)
       var i: number = 0;
       while (true) {
          b = this.readUnsignedByte();
@@ -421,23 +436,24 @@ export default class CustomDataWrapper {
             break;
          }
          if (b >= 128) {
-            low.fromNumber(low.toNumber() | (b & 127) << i);
+            result.low = result.low | (b & 127) << i;
             i = i + 7;
             continue;
          }
-         low.fromNumber(low.toNumber() | b << i);
-         return high.rotl(32).or(low).toNumber()
+         result.low = result.low | b << i;
+
+         return result.toNumber()
       }
       if (b >= 128) {
          b = b & 127;
-         low.fromNumber(low.toNumber() | b << i);
-         high.fromNumber(b >>> 4);
+         result.low = result.low | b << i;
+         result.high = b >>> 4;
          i = 3;
          while (true) {
             b = this.readUnsignedByte();
             if (i < 32) {
                if (b >= 128) {
-                  high.fromNumber(high.toNumber() | (b & 127) << i);
+                  result.high = result.high | (b & 127) << i;
                }
                else {
                   break;
@@ -445,295 +461,14 @@ export default class CustomDataWrapper {
             }
             i = i + 7;
          }
-         high.fromNumber(high.toNumber() | b << i);
-         return high.rotl(32).or(low).toNumber()
-      }
-      low.fromNumber(low.toNumber() | b << i);
-      high.fromNumber(b >>> 4);
-      return high.rotl(32).or(low).toNumber()
-   }
-   /* 
-   
-   public readVarLong() : number
-   {
-      return this.readInt64(this._data).toNumber();
-   }
-   
-   public readVarUhLong() : number
-   {
-      return this.readUInt64(this._data).toNumber();
-   }
-   public readBytes(bytes:ByteArray, offset:number = 0, length:number = 0) : void
-   {
-      this._data.readBytes(bytes,offset,length);
-   }
-   
- 
-   
-   
- 
-   
- 
-  
-   
-   public readUnsignedInt() : number
-   {
-      return this._data.readUnsignedInt();
-   }
-   
-   public readFloat() : number
-   {
-      return this._data.readFloat();
-   }
-   
-  
-   
-   public readMultiByte(length:number, charSet:string) : string
-   {
-      return this._data.readMultiByte(length,charSet);
-   }
- 
-   
-   public readUTFBytes(length:number) : string
-   {
-      return this._data.readUTFBytes(length);
-   }
-   
-   public get bytesAvailable() : number
-   {
-      return this._data.bytesAvailable;
-   }
-   
-   public readObject() : any
-   {
-      return this._data.readObject();
-   }
-   
-   public get objectEncoding() : number
-   {
-      return this._data.objectEncoding;
-   }
-   
-   public set objectEncoding(version:number)
-   {
-      this._data.objectEncoding = version;
-   }
-   
-   public get endian() : string
-   {
-      return this._data.endian;
-   }
-   
-   public set endian(type:string)
-   {
-      this._data.endian = type;
-   }
-   
-   public writeVarInt(value:number) : void
-   {
-      var b:any = 0;
-      var ba:ByteArray = new ByteArray();
-      if(value >= 0 && value <= CustomDataWrapper.MASK_01111111)
-      {
-         ba.writeByte(value);
-         this._data.writeBytes(ba);
-         return;
-      }
-      var c:number = value;
-      for(var buffer:ByteArray = new ByteArray(); c != 0; )
-      {
-         buffer.writeByte(c & CustomDataWrapper.MASK_01111111);
-         buffer.position = buffer.length - 1;
-         b = int(buffer.readByte());
-         c = c >>> CustomDataWrapper.CHUNCK_BIT_SIZE;
-         if(c > 0)
-         {
-            b = b | CustomDataWrapper.MASK_10000000;
-         }
-         ba.writeByte(b);
-      }
-      this._data.writeBytes(ba);
-   }
-   
-   public writeVarShort(value:number) : void
-   {
-      var b:any = 0;
-      if(value > CustomDataWrapper.SHORT_MAX_VALUE || value < CustomDataWrapper.SHORT_MIN_VALUE)
-      {
-         throw new Error("Forbidden value");
-      }
-      var ba:ByteArray = new ByteArray();
-      if(value >= 0 && value <= CustomDataWrapper.MASK_01111111)
-      {
-         ba.writeByte(value);
-         this._data.writeBytes(ba);
-         return;
-      }
-      var c:any = value & 65535;
-      for(var buffer:ByteArray = new ByteArray(); c != 0; )
-      {
-         buffer.writeByte(c & CustomDataWrapper.MASK_01111111);
-         buffer.position = buffer.length - 1;
-         b = int(buffer.readByte());
-         c = int(c >>> CustomDataWrapper.CHUNCK_BIT_SIZE);
-         if(c > 0)
-         {
-            b = b | CustomDataWrapper.MASK_10000000;
-         }
-         ba.writeByte(b);
-      }
-      this._data.writeBytes(ba);
-   }
-   
-   public writeVarLong(value:number) : void
-   {
-      var i:number = 0;
-      var val:Int64 = Int64.fromNumber(value);
-      if(val.high == 0)
-      {
-         this.writeint32(this._data,val.low);
-      }
-      else
-      {
-         for(i = 0; i < 4; )
-         {
-            this._data.writeByte(val.low & 127 | 128);
-            val.low = val.low >>> 7;
-            i++;
-         }
-         if((val.high & 268435455 << 3) == 0)
-         {
-            this._data.writeByte(val.high << 4 | val.low);
-         }
-         else
-         {
-            this._data.writeByte((val.high << 4 | val.low) & 127 | 128);
-            this.writeint32(this._data,val.high >>> 3);
-         }
-      }
-   }
-   
-   public writeBytes(bytes:ByteArray, offset:number = 0, length:number = 0) : void
-   {
-      this._data.writeBytes(bytes,offset,length);
-   }
-   
-   public writeBoolean(value:boolean) : void
-   {
-      this._data.writeBoolean(value);
-   }
-   
-   public writeByte(value:number) : void
-   {
-      this._data.writeByte(value);
-   }
-   
-   public writeShort(value:number) : void
-   {
-      this._data.writeShort(value);
-   }
-   
-   public writeInt(value:number) : void
-   {
-      this._data.writeInt(value);
-   }
-   
-   public writeUnsignedInt(value:number) : void
-   {
-      this._data.writeUnsignedInt(value);
-   }
-   
-   public writeFloat(value:number) : void
-   {
-      this._data.writeFloat(value);
-   }
-   
-   public writeDouble(value:number) : void
-   {
-      this._data.writeDouble(value);
-   }
-   
-   public writeMultiByte(value:string, charSet:string) : void
-   {
-      this._data.writeMultiByte(value,charSet);
-   }
-   
-   public writeUTF(value:string) : void
-   {
-      this._data.writeUTF(value);
-   }
-   
-   public writeUTFBytes(value:string) : void
-   {
-      this._data.writeUTFBytes(value);
-   }
-   
-   public writeObject(object:any) : void
-   {
-      this._data.writeObject(object);
-   }
-   
-   
-   
-   private readUInt64(input:IDataInput) : UInt64
-   {
-      var b:number = 0;
-      var result:UInt64 = new UInt64();
-      var i:number = 0;
-      while(true)
-      {
-         b = input.readUnsignedByte();
-         if(i == 28)
-         {
-            break;
-         }
-         if(b >= 128)
-         {
-            result.low = result.low | (b & 127) << i;
-            i = i + 7;
-            continue;
-         }
-         result.low = result.low | b << i;
-         return result;
-      }
-      if(b >= 128)
-      {
-         b = b & 127;
-         result.low = result.low | b << i;
-         high= b >>> 4;
-         i = 3;
-         while(true)
-         {
-            b = input.readUnsignedByte();
-            if(i < 32)
-            {
-               if(b >= 128)
-               {
-                  result.high = result.high | (b & 127) << i;
-               }
-               else
-               {
-                  break;
-               }
-            }
-            i = i + 7;
-         }
          result.high = result.high | b << i;
-         return result;
+
+         return result.toNumber()
       }
       result.low = result.low | b << i;
       result.high = b >>> 4;
-      return result;
+
+      return result.toNumber()
    }
    
-   private writeint32(output:IDataOutput, value:number) : void
-   {
-      while(value >= 128)
-      {
-         output.writeByte(value & 127 | 128);
-         value = value >>> 7;
-      }
-      output.writeByte(value);
-   }
-}*/
 }

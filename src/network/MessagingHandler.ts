@@ -80,8 +80,9 @@ export default class MessagingHandler {
                 //raw message unmodified
 
                 let rawMessage = this.buffer.slice(0, this.currentHeader.bodyLength)
-                if (this.currentHeader.name == "TeleportRequestMessage") {
-                    console.log("TeleportRequestMessage !!",
+             
+                if (this.currentHeader.name == "CharacterSelectedSuccessMessage") {
+                    console.log("CharacterSelectedSuccessMessage !!",
                      this.currentHeader.toRaw().toString("hex")+
                      rawMessage.toString("hex"))
                 }

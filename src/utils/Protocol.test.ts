@@ -8,7 +8,7 @@ test("serialize", () => {
   const header = Header.fromRaw(raw, true)
   if(header)
     header.bodyLength = header?.bodyLength -1
-  console.log(header,header?.toRaw())
+  //console.log(header,header?.toRaw())
   /*const rawBody = raw.slice(header?.headerLength)
   const data = deserialize(new CustomDataWrapper(rawBody), "NpcGenericActionRequestMessage")
   console.log(data)*/
@@ -18,9 +18,8 @@ test("serialize", () => {
 
 test("deserialize", () => {
 
-  let raw = Buffer.from("56BD00004B7A05EF8184D10E", "hex")
+  let raw = Buffer.from("026533ef81a8df1e0006446f636b65720d01000214ec0f0005014f42160206ca1603184a1c040497100546d451000182010000020001", "hex")
   const header = Header.fromRaw(raw, true)
-
   if (!header)
     return
 
@@ -28,13 +27,8 @@ test("deserialize", () => {
 
   const dataWrapper = new CustomDataWrapper(rawBody)
 
-  let res = deserialize(dataWrapper, header.name)
-
-
-  let rawRes = serialize(new CustomDataWrapper(), res, header.name)
-
-  expect(raw.length).toEqual(rawBody.length + header.headerLength)
-  expect(rawBody).toEqual(rawRes)
+  let res:any = deserialize(dataWrapper, header.name)
+  console.log(res.id)
 
 })
 

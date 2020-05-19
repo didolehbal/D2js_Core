@@ -88,6 +88,19 @@ export const replyToNPC = (replyId: number) => {
     return Buffer.concat([header.toRaw(), raw])
 }
 
+export const getMapInfo=(mapId:number) => {
+    
+    const type = types["MapInformationsRequestMessage"]
+
+    const data = {
+        mapId,
+    }
+    const raw = serialize(new CustomDataWrapper(), data, type.name)
+    let header = new Header(type.protocolId, raw.length, Header.GLOBAL_INSTANCE_ID + 1)
+
+    return Buffer.concat([header.toRaw(), raw])
+}
+
 export const talkToNPC = (npcId: number, npcActionId: number, npcMapId: number) => {
 
     const type = types["NpcGenericActionRequestMessage"]

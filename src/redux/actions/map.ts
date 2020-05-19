@@ -8,7 +8,14 @@ const serverActions: string[] = [
     "GameContextRemoveElementMessage",
     "SetCharacterRestrictionsMessage",
     "InteractiveElementUpdatedMessage",
-    "StatedElementUpdatedMessage"
+    "StatedElementUpdatedMessage",
+    "GameRolePlayShowChallengeMessage",
+    "GameRolePlayRemoveChallengeMessage",
+    "MapFightCountMessage",
+    "GameFightUpdateTeamMessage",
+    "MapRunningFightListMessage",
+    "MapRunningFightDetailsMessage"
+
 ]
 const clientActions: string[] = []
 
