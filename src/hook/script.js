@@ -20,6 +20,7 @@ Interceptor.attach(connect_p, {
   onEnter: function(args) {
     // int connect(int sockfd, const struct sockaddr *addr,
     //             socklen_t addrlen);
+    console.log("test")
     const blackList = ["34.252.21.81", "63.34.214.78", "52.17.231.202"];
     this.sockfd = args[0];
     var sockaddr_p = args[1];

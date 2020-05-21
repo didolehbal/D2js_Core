@@ -16,8 +16,11 @@ export function startAuthServer() {
     authProxy.start()
 }
 
-startAuthServer()
+/*startAuthServer()
 spawnClient()
+setTimeout(()=> {
+    spawnClient()
+},1000)*/
 
 export const api = {
     attackPlayer, saveZaap, teleport, usePopoRappel, useObject, passeTour, joinFight, readyFight, replyToNPC, talkToNPC, getMapInfo

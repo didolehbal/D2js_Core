@@ -114,6 +114,13 @@ export default function (state: MapState = {}, action: Action) {
                     fights: state[client_id].fights ? [...state[client_id].fights, data] : [data]
                 }
             }
+            case "GameFightStartingMessage":
+            return {
+                ...state, [client_id]: {
+                    ...state[client_id],
+                    fights: []
+                }
+            }
         case "GameFightUpdateTeamMessage":
             return {
                 ...state, [client_id]: {

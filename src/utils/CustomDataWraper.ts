@@ -102,7 +102,6 @@ export default class CustomDataWrapper {
       }
    }
     readVarLong() {
-       console.log(" read var long called")
       var result:Long = new Long(0,0,true);
       var shift = 0;
       var cursor = this.position;
