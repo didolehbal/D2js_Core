@@ -57,7 +57,7 @@ export default class CustomDataWrapper {
          case "VarUhLong":
             return this.readVarLong();
          case "VarLong":
-            return this.readInt64()
+            return this.readVarLong()
          case "VarUhInt":
          case "VarInt":
             return this.readVarInt()

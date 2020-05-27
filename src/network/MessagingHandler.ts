@@ -3,7 +3,7 @@ import { factory } from "../utils/Logger"
 import { deserialize, serialize } from "../utils/Protocol"
 import {MsgAction} from "../redux/types"
 import CustomDataWrapper from "../utils/CustomDataWraper"
-
+import fs from "fs"
 export default class MessagingHandler {
 
     private message: MsgAction | null = null;
@@ -54,11 +54,11 @@ export default class MessagingHandler {
                 }
               
                 if (isClient && Header.Global_InstanceID != this.currentHeader.instanceID) {
-                    console.log(`old instanceID:${Header.GLOBAL_INSTANCE_ID}`)
                     Header.GLOBAL_INSTANCE_ID = this.currentHeader.instanceID
                 }
 
-                this.log.debug(this.currentHeader.toString())
+              // this.log.debug(this.currentHeader.toString())
+
                 //check if this message is to alter
                 for (let i = 0; i < this.msgsActions.length; i++)
                     if (this.currentHeader.protocolID === this.msgsActions[i].protocolId) {
@@ -79,11 +79,22 @@ export default class MessagingHandler {
                 //update msg raw data
                 //raw message unmodified
                 let rawMessage = this.buffer.slice(0, this.currentHeader.bodyLength)
-                if (this.currentHeader.name == "PartyJoinMessage") {
-                    console.log("PartyJoinMessage !!",
-                     this.currentHeader.toRaw().toString("hex")+
-                     rawMessage.toString("hex"))
-                }
+                
+              /* if(this.currentHeader.name=="MapComplementaryInformationsDataMessage")
+                    console.log("MapComplementaryInformationsDataMessage",this.currentHeader.toRaw().toString("hex")+rawMessage.toString("hex"))
+                if(this.currentHeader.name=="UpdateMapPlayersAgressableStatusMessage")
+                    console.log("UpdateMapPlayersAgressableStatusMessage",this.currentHeader.toRaw().toString("hex")+rawMessage.toString("hex"))
+                if(this.currentHeader.name=="ExchangePlayerRequestMessage")
+                    console.log("ExchangePlayerRequestMessage",this.currentHeader.toRaw().toString("hex")+rawMessage.toString("hex"))
+                if(this.currentHeader.name=="RawDataMessage"){
+                    fs.writeFile("rdm.swf",rawMessage,(err)=>{
+                        if(err) console.log("ERRR")
+                        console.log("RawDataMessage")
+
+                    })
+                }*/
+               
+                
                 if (this.message) {
 
                     let msgContent = deserialize(new CustomDataWrapper(rawMessage), this.currentHeader.name)
@@ -122,9 +133,6 @@ export default class MessagingHandler {
             }
         } while (this.currentHeader == null && this.buffer.length > 0); // repeat while buffer is not empty and old msg ended
 
-
-        //log the headers
-        // headers.map(h => this.log.debug(h.toString()))
 
         return data
     }

@@ -50,6 +50,7 @@ export type Character = {
     isMyTurn: boolean
     inFight: boolean
     inFightPreparation: boolean
+    isSpectator:boolean
     isReady: boolean
     groupe: Groupe
     partyUpdates: []

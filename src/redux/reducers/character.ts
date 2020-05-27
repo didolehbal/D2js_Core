@@ -89,13 +89,20 @@ export default function (state: CharacterState = {}, action: Action) {
                     }
                 }
             }
+        case "GameFightSpectatorJoinMessage":
+            return {
+                ...state, [client_id]: {
+                    ...state[client_id],
+                    isSpectator: true
+                }
+            }
         case "GameFightStartingMessage":
             return {
                 ...state, [client_id]: {
                     ...state[client_id],
                     inFightPreparation: true
                 }
-            }
+            }  
        /* case "PartyUpdateMessage":
             return {
                 ...state, [client_id]: {
@@ -122,12 +129,14 @@ export default function (state: CharacterState = {}, action: Action) {
                     isMyTurn: false
                 }
             }
+        case "GameFightLeaveMessage":
         case "GameFightEndMessage":
             return {
                 ...state, [client_id]: {
                     ...state[client_id],
                     inFight: false,
-                    isMyTurn: false
+                    isMyTurn: false,
+                    isSpectator:false
                 }
             }
         case "GameFightTurnStartMessage":
@@ -144,6 +153,24 @@ export default function (state: CharacterState = {}, action: Action) {
                     isMyTurn: !(state[client_id].id == DoubleToVarLong(data.id))
                 }
             }
+        case "AllianceJoinedMessage":
+                return {
+                    ...state, [client_id]: {
+                        ...state[client_id],
+                        allianceTag:data.allianceTag,
+                        allianceId:data.allianceId,
+                        allianceName:data.allianceName
+                    }
+                }
+        case "AllianceLeftMessage":
+                return {
+                        ...state, [client_id]: {
+                        ...state[client_id],
+                        allianceTag:undefined,
+                        allianceId:undefined,
+                        allianceName:undefined
+                     }
+                }
         default:
             return state
     }

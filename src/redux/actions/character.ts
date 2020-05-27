@@ -19,6 +19,12 @@ const serverActions: string[] = [
     "GameFightStartMessage",// fight started
     "GameFightJoinMessage",// join success
     "GameFightHumanReadyStateMessage", // a player is ready
+    "GuildJoinedMessage",
+    "GuildLeftMessage",
+    "AllianceJoinedMessage",
+    "AllianceLeftMessage",
+    "GameFightLeaveMessage",
+    "GameFightSpectatorJoinMessage"
     //"GameRolePlayRemoveChallengeMessage",// remove fight sword from map
 ]
 const clientActions: string[] = []
