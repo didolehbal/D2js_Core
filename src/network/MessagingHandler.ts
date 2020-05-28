@@ -57,7 +57,7 @@ export default class MessagingHandler {
                     Header.GLOBAL_INSTANCE_ID = this.currentHeader.instanceID
                 }
 
-              // this.log.debug(this.currentHeader.toString())
+               //this.log.debug(this.currentHeader.toString())
 
                 //check if this message is to alter
                 for (let i = 0; i < this.msgsActions.length; i++)
@@ -80,10 +80,13 @@ export default class MessagingHandler {
                 //raw message unmodified
                 let rawMessage = this.buffer.slice(0, this.currentHeader.bodyLength)
                 
-              /* if(this.currentHeader.name=="MapComplementaryInformationsDataMessage")
-                    console.log("MapComplementaryInformationsDataMessage",this.currentHeader.toRaw().toString("hex")+rawMessage.toString("hex"))
-                if(this.currentHeader.name=="UpdateMapPlayersAgressableStatusMessage")
-                    console.log("UpdateMapPlayersAgressableStatusMessage",this.currentHeader.toRaw().toString("hex")+rawMessage.toString("hex"))
+            /* if(this.currentHeader.name=="PartyInvitationArenaRequestMessage")
+                    console.log("PartyInvitationArenaRequestMessage",this.currentHeader.toRaw().toString("hex")+rawMessage.toString("hex"))
+            if(this.currentHeader.name=="SequenceNumberMessage")
+                    console.log("SequenceNumberMessage",this.currentHeader.toRaw().toString("hex")+rawMessage.toString("hex")) 
+              */
+                    /* if(this.currentHeader.name=="SequenceNumberMessage")
+                    console.log("SequenceNumberMessage",this.currentHeader.toRaw().toString("hex")+rawMessage.toString("hex"))
                 if(this.currentHeader.name=="ExchangePlayerRequestMessage")
                     console.log("ExchangePlayerRequestMessage",this.currentHeader.toRaw().toString("hex")+rawMessage.toString("hex"))
                 if(this.currentHeader.name=="RawDataMessage"){

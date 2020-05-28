@@ -28,6 +28,16 @@ export const usePopoRappel = () => {
     const popoRappelGUID = 16416308
     return useObject(popoRappelGUID)
 }
+
+export const inviteToKoliGrp = (name:string, hash:Buffer) => {
+    const data = {
+        name
+    }
+    const raw = serialize(new CustomDataWrapper(), data, "PartyInvitationArenaRequestMessage")
+    let header = new Header(6283, raw.length + hash.length, Header.GLOBAL_INSTANCE_ID + 1)
+
+    return Buffer.concat([header.toRaw(), raw, hash])
+}
 export const teleport = (mapId: number, sourceType: number, destinationType: number): Buffer => {
     const data = {
         mapId,

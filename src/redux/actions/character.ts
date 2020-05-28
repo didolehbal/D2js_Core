@@ -12,6 +12,9 @@ const serverActions: string[] = [
     "PartyMemberInStandardFightMessage",
     "PartyNewMemberMessage",
     "PartyUpdateMessage",
+
+    "PartyCannotJoinErrorMessage",
+
     "GameFightStartingMessage", // fight preparation started
     "GameFightTurnStartMessage",
     "GameFightTurnEndMessage",
@@ -27,7 +30,9 @@ const serverActions: string[] = [
     "GameFightSpectatorJoinMessage"
     //"GameRolePlayRemoveChallengeMessage",// remove fight sword from map
 ]
-const clientActions: string[] = []
+const clientActions: string[] = [
+    "PartyInvitationArenaRequestMessage",
+]
 
 export default (client_id: number, store: any): { serverActions: MsgAction[], clientActions: MsgAction[] } => {
     return {

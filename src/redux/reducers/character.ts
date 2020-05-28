@@ -171,6 +171,21 @@ export default function (state: CharacterState = {}, action: Action) {
                         allianceName:undefined
                      }
                 }
+        case "PartyInvitationArenaRequestMessage":
+            return {
+                ...state, [client_id]: {
+                ...state[client_id],
+                invitedToKoli:data.name,
+                isKoliInvitationReceived:false
+             }
+        }
+        case "PartyCannotJoinErrorMessage":
+            return {
+                ...state, [client_id]: {
+                ...state[client_id],
+                isKoliInvitationReceived:true
+             }
+        }
         default:
             return state
     }
