@@ -6,9 +6,14 @@ import { MsgAction } from "../redux/types"
 import GameProxyServer from "./GameProxyServer";
 import { ObservableArray } from "../utils/ObservableArray";
 
+type gameServerToPort = {
+    port : number
+    serverAdress: string
+}
 export default class AuthProxyServer extends ProxyServer {
     private gameServers: ProxyServer[]
-    private gameServersPort: number = 7000
+    private gameServersPort: gameServerToPort[] = []
+    private PORT_INDEX = 7000
     constructor(private gameProxies: ObservableArray<Proxy>) {
         super(Config.authServerIps[0], Config.port)
         this.gameServers = []
@@ -34,16 +39,23 @@ export default class AuthProxyServer extends ProxyServer {
             if (this.gameServers.filter(server => {
                 return server.address == data.address
             }).length == 0) {
-                const server = new GameProxyServer(data.address, ++this.gameServersPort, this.gameProxies)
+                const servPort:gameServerToPort = {
+                    port:++this.PORT_INDEX,
+                    serverAdress:data.address
+                }
+                this.gameServersPort.push(servPort)
+
+                const server = new GameProxyServer(data.address,servPort.port , this.gameProxies)
                 server.start()
                 this.gameServers.push(server)
             }
             console.log(`redirected from ${data?.address} ${data?.ports}`)
         }
         const alter = (data: any) => {
+            const port = this.gameServersPort.filter(s =>s.serverAdress == data.address)[0].port
+            data.ports = [port]
             data.address = "localhost";
-            data.ports = [this.gameServersPort]
-            console.log(`to localhost [5555]`)
+            console.log(`to localhost [${port}]`)
         }
         const msgAction1: MsgAction = {
             protocolId: 6469,

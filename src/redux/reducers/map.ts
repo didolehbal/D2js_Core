@@ -50,7 +50,7 @@ export default function (state: MapState = {}, action: Action) {
                     }
                 }
             else return state
-        case "UpdateMapPlayersAgressableStatusMessage":
+       /* case "UpdateMapPlayersAgressableStatusMessage":
             return {
                 ...state, [client_id]: {
                     ...state[client_id],
@@ -66,7 +66,7 @@ export default function (state: MapState = {}, action: Action) {
                             }
                             )
                 }
-            }
+            }*/
         case "SetCharacterRestrictionsMessage":
             return {
                 ...state, [client_id]: {

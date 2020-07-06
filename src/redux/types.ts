@@ -9,8 +9,6 @@ export type MsgAction = {
     doInBackground: Function | null,
 }
 
-
-
 type Groupe = {
     partyId: number
     members: Actor[]
@@ -54,6 +52,17 @@ export type Character = {
     isReady: boolean
     groupe: Groupe
     partyUpdates: []
+    koli:Koli
+    isAgressable:boolean
+
+}
+
+type Koli = {
+    invitedToKoli:string,
+    results : [{
+        name:string,
+        online : boolean
+    }]
 }
 type Actor = {
     contextualId: number

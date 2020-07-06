@@ -80,8 +80,8 @@ export default class MessagingHandler {
                 //raw message unmodified
                 let rawMessage = this.buffer.slice(0, this.currentHeader.bodyLength)
                 
-            /* if(this.currentHeader.name=="PartyInvitationArenaRequestMessage")
-                    console.log("PartyInvitationArenaRequestMessage",this.currentHeader.toRaw().toString("hex")+rawMessage.toString("hex"))
+            /* if(this.currentHeader.name=="GameRolePlayShowActorMessage")
+                    console.log("GameRolePlayShowActorMessage",this.currentHeader.toRaw().toString("hex")+rawMessage.toString("hex"))
             if(this.currentHeader.name=="SequenceNumberMessage")
                     console.log("SequenceNumberMessage",this.currentHeader.toRaw().toString("hex")+rawMessage.toString("hex")) 
               */
