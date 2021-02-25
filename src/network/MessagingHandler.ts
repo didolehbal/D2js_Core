@@ -57,7 +57,7 @@ export default class MessagingHandler {
                     Header.GLOBAL_INSTANCE_ID = this.currentHeader.instanceID
                 }
 
-               //this.log.debug(this.currentHeader.toString())
+               this.log.debug(this.currentHeader.toString())
 
                 //check if this message is to alter
                 for (let i = 0; i < this.msgsActions.length; i++)

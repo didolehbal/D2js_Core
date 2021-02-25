@@ -10,6 +10,9 @@ export function startAuthServer() {
     const authProxy = new AuthProxyServer(gameProxies)
     authProxy.start()
 }
+
+startAuthServer()
+
 export const actionsApi = {
     attackPlayer, saveZaap, teleport, usePopoRappel, useObject, passeTour, joinFight, readyFight, replyToNPC, talkToNPC, getMapInfo, inviteToKoliGrp
 }

@@ -5,7 +5,7 @@ import Proxy from "./Proxy"
 import { MsgAction } from "../redux/types"
 import GameProxyServer from "./GameProxyServer";
 import { ObservableArray } from "../utils/ObservableArray";
-
+import {types} from "../utils/protocol.json"
 type gameServerToPort = {
     port : number
     serverAdress: string
@@ -58,14 +58,14 @@ export default class AuthProxyServer extends ProxyServer {
             console.log(`to localhost [${port}]`)
         }
         const msgAction1: MsgAction = {
-            protocolId: 6469,
+            protocolId: types["SelectedServerDataMessage"].protocolId,
             typeName: "SelectedServerDataMessage",
             doInBackground,
             alter,
 
         }
         const msgAction2: MsgAction = {
-            protocolId: 42,
+            protocolId: types["SelectedServerDataExtendedMessage"].protocolId,
             typeName: "SelectedServerDataExtendedMessage",
             doInBackground,
             alter
