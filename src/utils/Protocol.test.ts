@@ -1,37 +1,26 @@
 import { deserialize, serialize, readAtomicType, writeAtomicType } from "./Protocol"
 import CustomDataWrapper from "./CustomDataWraper"
 import Header from "./Header"
+import { attackPlayer, usePopoRappel } from "../api"
 
-
+/*
 test("serialize", () => {
   const raw = Buffer.from("598D00004DF638EF81A403", "hex")
   const header = Header.fromRaw(raw, true)
   if(header)
     header.bodyLength = header?.bodyLength -1
   //console.log(header,header?.toRaw())
-  /*const rawBody = raw.slice(header?.headerLength)
+  const rawBody = raw.slice(header?.headerLength)
   const data = deserialize(new CustomDataWrapper(rawBody), "NpcGenericActionRequestMessage")
-  console.log(data)*/
+  console.log(data)
 
 })
-
+*/
 
 test("deserialize", () => {
-
-  let raw = Buffer.from("0ed900000087400003721b620d61f141a2580e08000000bda5769fb06be40246fb262bd34a1a2f9347839ec430eb49f8f2f7001a9904d9b4d6a4c06493eeefe37849863c15328b", "hex")
-  const header = Header.fromRaw(raw, true)
-  if (!header)
-    return
-
-  let rawBody = raw.slice(header.headerLength)
-
-  const dataWrapper = new CustomDataWrapper(rawBody)
-
-  let res:any = deserialize(dataWrapper, header.name)
-  console.log(res)
-
+  console.log(usePopoRappel())
 })
-
+/*
 test("read write AtomicVar", () => {
   let vars: any[] = [
     {
@@ -94,4 +83,4 @@ test("read write AtomicVar", () => {
 })
 test("header", () => {
   const head = Header.fromRaw(Buffer.from("598d0000000138", "hex"), true)
-})
+})*/

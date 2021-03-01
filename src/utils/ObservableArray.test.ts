@@ -3,20 +3,14 @@ test("mock", () => {
 
     const array = ObservableArrayFactory<string>()
 
-    console.log(array.items)
+   
+    array.push("1")
+    array.push("2")
+    array.push("3")
+    array.remove("1")
+    
 
-    array.on("push",(d:string)=>{
-        console.log(d+" is pushed")
-    })
-    array.on("remove",(d:string)=>{
-        console.log(d+" is removed")
-    })
-
-    array.push("Hello")
-
-    array.push("World")
-
-    array.remove("Hello")
+    
 
     console.log(array.items)
 

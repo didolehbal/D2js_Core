@@ -85,6 +85,7 @@ type Actor = {
     alignmentValue: number
     alignmentGrade: number
     characterPower: number
+    level:number
     options: []
 }
 type TeamMember = {

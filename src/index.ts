@@ -11,7 +11,7 @@ export function startAuthServer() {
     authProxy.start()
 }
 
-startAuthServer()
+//startAuthServer()
 
 export const actionsApi = {
     attackPlayer, saveZaap, teleport, usePopoRappel, useObject, passeTour, joinFight, readyFight, replyToNPC, talkToNPC, getMapInfo, inviteToKoliGrp

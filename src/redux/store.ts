@@ -7,9 +7,9 @@ import reducers from "./reducers"
 export const store = createStore(
 reducers, {},
  devToolsEnhancer({
-    hostname: "192.168.8.101",
+    hostname: "localhost",
     port: 8000,
     realtime: true,
-    name: "D2Bot "
+    name: "D2Bot"
   })
 )

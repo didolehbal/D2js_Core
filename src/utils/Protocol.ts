@@ -46,7 +46,8 @@ export function readAtomicType(data: CustomDataWrapper, desc: variable): {} {
             result = data.read(desc.type)
         }
     } catch (ex) {
-        console.trace(ex)
+        console.trace(ex, desc)
+        process.exit(-1)
         return "ERROR"
     }
 

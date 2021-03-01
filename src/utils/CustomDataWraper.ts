@@ -75,6 +75,7 @@ export default class CustomDataWrapper {
 
       switch (type) {
          case "UnsignedShort":
+            return this.writeUnsignedShort(value)
          case "Short":
             return this.writeShort(value)
          case "VarUhLong":
@@ -226,6 +227,11 @@ export default class CustomDataWrapper {
    }
 
 
+   public writeUnsignedShort(value: number): void{
+      let buff = Buffer.alloc(2)
+      buff.writeUInt16BE(value)
+      this._data = Buffer.concat([this._data, buff])
+   }
    public writeByte(value: number): void {
       let buff = Buffer.alloc(1)
       buff.writeUIntBE(value & 255, 0, 1)

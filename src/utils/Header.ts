@@ -66,7 +66,7 @@ export default class Header {
         if (this._lenType > 3)
             throw Error("lentype Exceeded 3")
 
-        dw.writeShort(this._protocolID << 2 | this._lenType)
+        dw.writeUnsignedShort(this._protocolID << 2 | this._lenType)
 
         if (this._isClient)
             dw.writeInt(this.instanceID)
@@ -102,7 +102,7 @@ export default class Header {
 
         let instanceID = 0
         if (isClient)
-            instanceID = dw.readInt()
+            instanceID = dw.readUnsignedInt()
 
         let bodyLength = 0
         if (lenType > 0) {

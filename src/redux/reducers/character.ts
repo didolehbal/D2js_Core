@@ -6,6 +6,11 @@ import { DoubleToVarLong } from "../../utils/convert"
 export default function (state: CharacterState = {}, action: Action) {
     const { data, client_id } = action.payload || { data: 0, client_id: 0 }
     switch (action.type) {
+        case "REMOVE_CLIENT":
+            return {
+                ...state,
+                [client_id]: undefined
+            }
         case "CharacterSelectedSuccessMessage":
             return {
                 ...state,

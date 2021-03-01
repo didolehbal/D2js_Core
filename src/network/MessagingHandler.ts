@@ -3,7 +3,7 @@ import { factory } from "../utils/Logger"
 import { deserialize, serialize } from "../utils/Protocol"
 import {MsgAction} from "../redux/types"
 import CustomDataWrapper from "../utils/CustomDataWraper"
-import fs from "fs"
+
 export default class MessagingHandler {
 
     private message: MsgAction | null = null;
@@ -80,6 +80,16 @@ export default class MessagingHandler {
                 //raw message unmodified
                 let rawMessage = this.buffer.slice(0, this.currentHeader.bodyLength)
                 
+               /* if(this.currentHeader.name=="GameRolePlayPlayerFightRequestMessage"){
+                    console.log("GameRolePlayPlayerFightRequestMessage",this.currentHeader.toRaw().toString("hex")+rawMessage.toString("hex"))
+                    let msgContent = deserialize(new CustomDataWrapper(rawMessage), this.currentHeader.name)
+                    console.log({msgContent})
+                }
+                if(this.currentHeader.name=="ObjectUseMessage"){
+                    console.log("ObjectUseMessage",this.currentHeader.toRaw().toString("hex")+rawMessage.toString("hex"))
+                    let msgContent = deserialize(new CustomDataWrapper(rawMessage), this.currentHeader.name)
+                    console.log({msgContent})
+                }*/
             /* if(this.currentHeader.name=="GameRolePlayShowActorMessage")
                     console.log("GameRolePlayShowActorMessage",this.currentHeader.toRaw().toString("hex")+rawMessage.toString("hex"))
             if(this.currentHeader.name=="SequenceNumberMessage")
@@ -99,7 +109,7 @@ export default class MessagingHandler {
                
                 
                 if (this.message) {
-
+                    
                     let msgContent = deserialize(new CustomDataWrapper(rawMessage), this.currentHeader.name)
                     if (this.message.doInBackground != null)
                         this.message.doInBackground(msgContent)

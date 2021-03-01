@@ -1,6 +1,6 @@
 
 export function ObservableArrayFactory<T>() : ObservableArray<T> {
-    let array: Array<T> = [];
+    let array = new Array<T>();
 
     type ArrayEvent = "push" | "remove"
 
@@ -15,10 +15,14 @@ export function ObservableArrayFactory<T>() : ObservableArray<T> {
     }
 
     function remove(el: T) {
-        array = array.filter(elm => elm != el)
-        if (onRemove) {
-            onRemove(el)
-        }
+        const index = array.indexOf(el);
+        if (index > -1) {
+            array.splice(index, 1);
+            if (onRemove) {
+                onRemove(el)
+            }
+        }else console.error("Ovservable el not found")
+        
     }
 
     function on(evt: ArrayEvent, cb: Function) {

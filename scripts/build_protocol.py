@@ -8,6 +8,8 @@ import argparse
 import json
 from tqdm import tqdm
 
+print(tqdm)
+
 class_pattern = r"\s*public class (?P<name>\w+) (?:extends (?P<parent>\w+) )?implements (?P<interface>\w+)\n"
 id_pattern = r"\s*public static const protocolId:uint = (?P<id>\d+);\n"
 public_var_pattern = r"\s*public var (?P<name>\w+):(?P<type>\S*)( = (?P<init>.*))?;\n"

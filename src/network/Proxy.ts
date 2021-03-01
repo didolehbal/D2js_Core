@@ -91,10 +91,7 @@ export default class Proxy {
             server.resume();
         });
 
-        /*client.on('close', function (had_error) { // Implemented upon connection
-            console.log("Client Disconnected", { error: had_error })
-            server.end();
-        });*/
+     
         server.on('drain', function () {
             client.resume();
         });

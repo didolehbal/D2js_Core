@@ -15,7 +15,7 @@ export default class AuthProxyServer extends ProxyServer {
     private gameServersPort: gameServerToPort[] = []
     private PORT_INDEX = 7000
     constructor(private gameProxies: ObservableArray<Proxy>) {
-        super(Config.authServerIps[0], Config.port)
+        super(Config.authServerIps[1], Config.port)
         this.gameServers = []
     }
 
@@ -51,12 +51,14 @@ export default class AuthProxyServer extends ProxyServer {
             }
             console.log(`redirected from ${data?.address} ${data?.ports}`)
         }
+
         const alter = (data: any) => {
             const port = this.gameServersPort.filter(s =>s.serverAdress == data.address)[0].port
             data.ports = [port]
-            data.address = "localhost";
+            data.address = "127.0.0.1";
             console.log(`to localhost [${port}]`)
         }
+
         const msgAction1: MsgAction = {
             protocolId: types["SelectedServerDataMessage"].protocolId,
             typeName: "SelectedServerDataMessage",
