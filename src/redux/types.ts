@@ -51,7 +51,7 @@ export type Character = {
     isSpectator:boolean
     isReady: boolean
     groupe: Groupe
-    partyUpdates: []
+    partyUpdates: Array<any>
     koli:Koli
     isAgressable:boolean
 
@@ -69,7 +69,7 @@ type Actor = {
     cellId: number
     direction: number
     bonesId: number
-    subentities: []
+    subentities: Array<any>
     name: string
     cantBeAggressed: boolean
     cantBeChallenged: boolean
@@ -86,7 +86,7 @@ type Actor = {
     alignmentGrade: number
     characterPower: number
     level:number
-    options: []
+    options : Array<any>
 }
 type TeamMember = {
     id: number
@@ -105,13 +105,13 @@ type Fight = {
     fightId: number
     fightType: number
     fightTeams: FightTeam[]
-    fightTeamsPositions: []
-    fightTeamsOptions: []
+    fightTeamsPositions : Array<any>
+    fightTeamsOptions : Array<any>
 }
 export type Map = {
     subAreaId: number
     mapId: number
-    obstacles: []
+    obstacles : Array<any>
     fights: Fight[]
     fightCount: number
     //runningFights:any
@@ -120,8 +120,8 @@ export type Map = {
     actors: Actor[]
     players: Actor[]
     monsters: Actor[]
-    statedElements: []
-    interactiveElements: []
+    statedElements : Array<any>
+    interactiveElements : Array<any>
 }
 export type CharacterState = {
     [key: number]: Character

@@ -14,6 +14,13 @@ export const attackPlayer = (targetId: number, targetCellId: number, friendly: b
 
     return Buffer.concat([header.toRaw(), raw, hash])
 }
+export const changerDePersonnage = () => {
+    const raw = serialize(new CustomDataWrapper(), {}, "ReloginTokenRequestMessage")
+    let header = new Header(types["ReloginTokenRequestMessage"].protocolId, raw.length , Header.GLOBAL_INSTANCE_ID + 1)
+
+    return Buffer.concat([header.toRaw(), raw])
+}
+
 export const useObject = (objectUID: number) => {
     const data = {
         objectUID

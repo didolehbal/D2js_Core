@@ -2,7 +2,7 @@ import { Action, CharacterState } from "../types"
 import { DoubleToVarLong } from "../../utils/convert"
 
 
-
+//TOOD : KICK COMBAT
 export default function (state: CharacterState = {}, action: Action) {
     const { data, client_id } = action.payload || { data: 0, client_id: 0 }
     switch (action.type) {
@@ -150,7 +150,8 @@ export default function (state: CharacterState = {}, action: Action) {
                     ...state[client_id],
                     inFight: false,
                     isMyTurn: false,
-                    isSpectator: false
+                    isSpectator: false,
+                    inFightPreparation: false,
                 }
             }
         case "GameFightTurnStartMessage":

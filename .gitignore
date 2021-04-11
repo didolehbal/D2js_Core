@@ -4,5 +4,6 @@ yarn.lock
 DofusInvoker.swf
 sockethook
 scripts/sources
+scripts/scripts
 legacy
 sources

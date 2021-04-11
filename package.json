@@ -17,11 +17,12 @@
   "dependencies": {
     "@types/jest": "^25.1.3",
     "@types/long": "^4.0.1",
+    "@types/remote-redux-devtools": "^0.5.4",
     "jest": "^25.1.0",
     "long": "^4.0.0",
-    "@types/remote-redux-devtools": "^0.5.4",
-    "remote-redux-devtools": "^0.5.16",
     "redux": "^4.0.5",
+    "remote-redux-devtools": "^0.5.16",
+    "socks": "^2.6.0",
     "ts-jest": "^25.2.1",
     "typescript-logging": "^0.6.4"
   }
