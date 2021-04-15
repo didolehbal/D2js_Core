@@ -2,13 +2,15 @@ import { serialize } from "../utils/Protocol"
 import CustomDataWrapper from "../utils/CustomDataWraper"
 import Header from "../utils/Header"
 import { types } from "../utils/protocol.json"
+import crypto from "crypto"
 
-export const attackPlayer = (targetId: number, targetCellId: number, friendly: boolean, hash: Buffer): Buffer => {
+export const attackPlayer = (targetId: number, targetCellId: number, friendly: boolean): Buffer => {
     const data = {
         targetId,
         targetCellId,
         friendly
     }
+    const hash = crypto.randomBytes(48)
     const raw = serialize(new CustomDataWrapper(), data, "GameRolePlayPlayerFightRequestMessage")
     let header = new Header(types["GameRolePlayPlayerFightRequestMessage"].protocolId, raw.length + hash.length, Header.GLOBAL_INSTANCE_ID + 1)
 

@@ -6,6 +6,8 @@ import { MsgAction } from "../redux/types"
 import GameProxyServer from "./GameProxyServer";
 import { ObservableArray } from "../utils/ObservableArray";
 import {types} from "../utils/protocol.json"
+import { CustomSocksProxy } from "./CustomSocksProxy";
+
 type gameServerToPort = {
     port : number
     serverAdress: string
@@ -14,7 +16,7 @@ export default class AuthProxyServer extends ProxyServer {
     private gameServers: ProxyServer[]
     private gameServersPort: gameServerToPort[] = []
     private PORT_INDEX = 7000
-    constructor(private gameProxies: ObservableArray<Proxy>) {
+    constructor(private gameProxies: ObservableArray<Proxy>, private socksProxy : CustomSocksProxy,) {
         super(Config.authServerIps[1], Config.port)
         this.gameServers = []
     }
@@ -45,7 +47,7 @@ export default class AuthProxyServer extends ProxyServer {
                 }
                 this.gameServersPort.push(servPort)
 
-                const server = new GameProxyServer(data.address,servPort.port , this.gameProxies)
+                const server = new GameProxyServer(data.address,servPort.port , this.gameProxies, this.socksProxy)
                 server.start()
                 this.gameServers.push(server)
             }
